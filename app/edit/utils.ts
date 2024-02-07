@@ -4,7 +4,9 @@ export function getNonAssignedPlayers(
   allPlayers: Player[],
   attendingPlayers: Player[]
 ) {
-  return allPlayers.filter((player) => !attendingPlayers.includes(player));
+  return allPlayers.filter(
+    ({ id }) => !attendingPlayers.some((p) => p.id === id)
+  );
 }
 
 type ExtendedPlayer = Player & { score: number };

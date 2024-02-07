@@ -7,12 +7,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Game, Player, Score } from "@prisma/client";
-import { useState } from "react";
+import { useOptimistic, useRef, useState } from "react";
 import { EditGameProvider, useEditGame } from "./context";
 import { getNonAssignedPlayers, getPlayerScores } from "./utils";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { handleAddPlayerToGame } from "./api";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 type ExtendedGame = Game & { players: Player[] } & { scores: Score[] };
 
@@ -23,15 +25,13 @@ interface GamesProps {
 
 function GameDetails({ game }: { game: ExtendedGame }) {
   const { players } = useEditGame();
-  const nonAssignedPlayers = getNonAssignedPlayers(players, game.players);
-  const scoredPlayers = getPlayerScores(game.scores, game.players);
-
-  function handleAddPlayer(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const playerId = parseInt(formData.get("test") as string);
-    handleAddPlayerToGame(game.id, playerId);
-  }
+  const [gamePlayers, addGamePlayer] = useOptimistic(
+    game.players,
+    (state: Player[], player: Player) => [...state, player]
+  );
+  const formRef = useRef<HTMLFormElement | null>(null);
+  const nonAssignedPlayers = getNonAssignedPlayers(players, gamePlayers);
+  const scoredPlayers = getPlayerScores(game.scores, gamePlayers);
 
   return (
     <div>
@@ -44,10 +44,24 @@ function GameDetails({ game }: { game: ExtendedGame }) {
         ))}
       </ul>
       <div className="flex gap-2">
-        <form onSubmit={handleAddPlayer}>
-          <Select name="test">
+        <form
+          ref={formRef}
+          action={(formData) => {
+            const playerId = parseInt(formData.get("player") as string);
+            const player = players.find((player) => player.id === playerId);
+            if (!player) return;
+            addGamePlayer(player);
+            handleAddPlayerToGame(game.id, playerId);
+          }}
+        >
+          <Select
+            onValueChange={() => {
+              formRef.current?.requestSubmit();
+            }}
+            name="player"
+          >
             <SelectTrigger>
-              <SelectValue placeholder="Välj spelare" />
+              <SelectValue placeholder="Lägg till spelare" />
             </SelectTrigger>
             <SelectContent>
               {nonAssignedPlayers.map((player) => (
@@ -57,9 +71,6 @@ function GameDetails({ game }: { game: ExtendedGame }) {
               ))}
             </SelectContent>
           </Select>
-          <Button type="submit" className="flex gap-1">
-            Lägg till <Plus size={16} />
-          </Button>
         </form>
       </div>
     </div>
@@ -67,17 +78,20 @@ function GameDetails({ game }: { game: ExtendedGame }) {
 }
 
 export default function Games({ games, players }: GamesProps) {
-  const [selectedGame, setSelectedGame] = useState<number | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const gameId = searchParams.get("game");
 
   function selectGame(gameId: string) {
-    setSelectedGame(parseInt(gameId));
+    router.push(`${pathname}?game=${gameId}`);
   }
 
-  function findGame(id: number) {
-    return games.find((game) => game.id === id);
+  function findGame(id: string) {
+    return games.find((game) => game.id === parseInt(id));
   }
 
-  const game = selectedGame ? findGame(selectedGame) : null;
+  const game = gameId ? findGame(gameId) : null;
 
   return (
     <EditGameProvider values={{ players }}>
