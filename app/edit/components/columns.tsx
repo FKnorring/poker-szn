@@ -3,6 +3,7 @@ import { Player, Score } from "@prisma/client";
 import { ExtendedPlayer } from "../utils";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { useTable } from "../context";
 
 interface EditableCellProps {
   id: number;
@@ -11,16 +12,21 @@ interface EditableCellProps {
 }
 
 function EditableCell({ id, type, amount }: EditableCellProps) {
-  const [value, setValue] = useState(amount);
+  const { updatePlayer } = useTable();
 
   return (
     <Input
       className="w-24"
       name={`${type}-${id}`}
       type="number"
-      value={value}
+      value={amount}
       onChange={(e) => {
-        setValue(Number(e.target.value));
+        const value = e.target.value;
+        updatePlayer(
+          id,
+          type === "buyins" ? +value : undefined,
+          type === "stack" ? +value : undefined
+        );
       }}
     />
   );
@@ -55,7 +61,7 @@ export const columns: ColumnDef<ExtendedPlayer>[] = [
       const buyins = cell.row.original.buyins;
       const stack = cell.row.original.stack;
 
-      return -buyins * 10 + stack;
+      return -buyins * 100 + stack;
     },
   },
 ];

@@ -1,6 +1,6 @@
 import { Game, Player, Score } from "@prisma/client";
-import { useEditGame } from "../context";
-import { useOptimistic, useRef } from "react";
+import { TableProvider, useEditGame } from "../context";
+import { useOptimistic, useRef, useState } from "react";
 import { getNonAssignedPlayers, getPlayerScores } from "../utils";
 import {
   handleAddPlayerToGame,
@@ -24,12 +24,31 @@ import { toast } from "sonner";
 
 export default function GameDetails({ game }: { game: ExtendedGame }) {
   const { players } = useEditGame();
-  const [gamePlayers, addGamePlayer] = useOptimistic(
-    game.players,
-    (state: Player[], player: Player) => [...state, player]
+  const [gamePlayers, setGamePlayers] = useState(game.players);
+  const [scoredPlayers, setScoredPlayers] = useState(
+    getPlayerScores(game.scores, gamePlayers)
   );
+
   const nonAssignedPlayers = getNonAssignedPlayers(players, gamePlayers);
-  const scoredPlayers = getPlayerScores(game.scores, gamePlayers);
+
+  function handleUpdatePlayer(
+    id: number,
+    buyins: number | undefined,
+    stack: number | undefined
+  ) {
+    setScoredPlayers((players) =>
+      players.map((player) => {
+        if (player.id === id) {
+          return {
+            ...player,
+            buyins: buyins ?? player.buyins,
+            stack: stack ?? player.stack,
+          };
+        }
+        return player;
+      })
+    );
+  }
 
   async function handleAddPlayer(formData: FormData) {
     const name = formData.get("player") as string;
@@ -37,23 +56,33 @@ export default function GameDetails({ game }: { game: ExtendedGame }) {
     const player = players.find((player) => player.name === name);
     if (gamePlayers.some((p) => p.id === player?.id)) return;
     if (!player) {
-      await handleAddNewPlayerToGame(name, game.id);
+      const { player, score } = await handleAddNewPlayerToGame(name, game.id);
+      setGamePlayers((players) => [...players, player]);
+      setScoredPlayers((players) => [
+        ...players,
+        { ...player, buyins: 1, stack: 0 },
+      ]);
       return toast(`Ny spelare ${name} har lagts till i matchen!`, {
         description: new Date().toLocaleTimeString("sv-SE"),
       });
     }
     await handleAddPlayerToGame(player.id, game.id);
+    setGamePlayers((players) => [...players, player]);
+    setScoredPlayers((players) => [
+      ...players,
+      { ...player, buyins: 1, stack: 0 },
+    ]);
     toast(`${name} har lagts till i matchen!`, {
       description: new Date().toLocaleTimeString("sv-SE"),
     });
   }
 
-  async function handleUpdateScores(formData: FormData) {
+  async function handleUpdateScores() {
     const scores = scoredPlayers.map((player) => {
-      const score = formData.get(`score-${player.id}`) as string;
       return {
         playerId: player.id,
-        score: Number(score),
+        buyins: player.buyins,
+        stack: player.stack,
       };
     });
     await handleUpdateGameScores(scores, game.id);
@@ -79,16 +108,20 @@ export default function GameDetails({ game }: { game: ExtendedGame }) {
           </Button>
         </form>
 
-        <form className="flex flex-col gap-2" action={handleUpdateScores}>
-          <DataTable columns={columns} data={scoredPlayers} />
-          <Button
-            type="submit"
-            className="flex items-center gap-2"
-            variant="destructive"
-          >
-            Spara <SaveIcon size={16} />
-          </Button>
-        </form>
+        <TableProvider
+          values={{ players: scoredPlayers, updatePlayer: handleUpdatePlayer }}
+        >
+          <form className="flex flex-col gap-2" action={handleUpdateScores}>
+            <DataTable columns={columns} data={scoredPlayers} />
+            <Button
+              type="submit"
+              className="flex items-center gap-2"
+              variant="destructive"
+            >
+              Spara <SaveIcon size={16} />
+            </Button>
+          </form>
+        </TableProvider>
       </div>
     </>
   );

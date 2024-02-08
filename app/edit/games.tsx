@@ -17,6 +17,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import ListGame from "./components/list-game";
+import { toast } from "sonner";
 
 export type ExtendedGame = Game & { players: Player[] } & { scores: Score[] };
 
@@ -26,35 +27,31 @@ interface GamesProps {
 }
 
 export default function Games({ games, players }: GamesProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const gameId = searchParams.get("game");
-  const [selectedGame, setSelectedGame] = useState<number | null>(
-    gameId ? parseInt(gameId) : null
-  );
+  const [selectedGame, setSelectedGame] = useState<number | null>(null);
+  const [_games, setGames] = useState(games);
 
   function selectGame(gameId: number) {
     if (gameId === selectedGame) {
       setSelectedGame(null);
-      router.push(pathname);
       return;
     }
     setSelectedGame(gameId);
-    router.push(`${pathname}?game=${gameId}`);
+  }
+
+  async function handleAddNewGame(formData: FormData) {
+    const date = formData.get("date") as string;
+    if (!date) return;
+    const game = await handleAddGame(date);
+    setGames((games) => [...games, { ...game, players: [], scores: [] }]);
+    toast("Matchen har lagts till!", {
+      description: new Date().toLocaleTimeString("sv-SE"),
+    });
   }
 
   return (
     <EditGameProvider values={{ players }}>
       <div className="flex flex-col gap-2">
-        <form
-          className="flex gap-2"
-          action={(formData) => {
-            const date = formData.get("date") as string;
-            if (!date) return;
-            handleAddGame(date);
-          }}
-        >
+        <form className="flex gap-2" action={handleAddNewGame}>
           <DatePicker />
           <Button
             type="submit"
@@ -64,14 +61,16 @@ export default function Games({ games, players }: GamesProps) {
           </Button>
         </form>
         <div className="flex flex-col gap-2">
-          {games.map((game) => (
+          {_games.map((game) => (
             <Collapsible
               key={game.id}
-              role="button"
               className="border py-4 px-6 rounded-md flex flex-col shadow-sm"
-              onClick={() => selectGame(game.id)}
             >
-              <CollapsibleTrigger className="w-full flex justify-between">
+              <CollapsibleTrigger
+                role="button"
+                onClick={() => selectGame(game.id)}
+                className="w-full flex justify-between"
+              >
                 <ListGame game={game} />
                 {game.id === selectedGame ? <ChevronDown /> : <ChevronRight />}
               </CollapsibleTrigger>

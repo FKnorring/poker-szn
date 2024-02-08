@@ -7,20 +7,21 @@ import {
 } from "@/app/utils";
 
 export async function handleAddPlayerToGame(playerId: number, gameId: number) {
-  await addPlayerToGame(playerId, gameId);
+  return await addPlayerToGame(playerId, gameId);
 }
 
 export async function handleAddNewPlayerToGame(name: string, gameId: number) {
-  await addNewPlayerToGame(name, gameId);
+  return await addNewPlayerToGame(name, gameId);
 }
 
 export async function handleAddGame(date: string) {
-  await addGame(new Date(date));
+  return await addGame(new Date(date));
 }
 
 type ScoreData = {
   playerId: number;
-  score: number;
+  buyins: number;
+  stack: number;
 };
 
 export async function handleUpdateGameScores(
