@@ -6,6 +6,7 @@ import {
   handleAddPlayerToGame,
   handleAddNewPlayerToGame,
   handleUpdateGameScores,
+  handleRemovePlayerFromGame,
 } from "../api";
 import {
   Select,
@@ -79,6 +80,20 @@ export default function GameDetails({ game }: { game: ExtendedGame }) {
     });
   }
 
+  async function handleRemovePlayer(formData: FormData) {
+    const playerId = parseInt(formData.get("playerId") as string);
+    if (!playerId) return;
+    const player = gamePlayers.find((player) => player.id === playerId);
+    if (!player) return;
+    const newPlayers = gamePlayers.filter((player) => player.id !== playerId);
+    await handleRemovePlayerFromGame(playerId, game.id);
+    setGamePlayers(newPlayers);
+    setScoredPlayers((players) => players.filter((p) => p.id !== playerId));
+    toast(`${player.name} har tagits bort från matchen!`, {
+      description: new Date().toLocaleTimeString("sv-SE"),
+    });
+  }
+
   async function handleUpdateScores() {
     const scores = scoredPlayers.map((player) => {
       return {
@@ -106,18 +121,18 @@ export default function GameDetails({ game }: { game: ExtendedGame }) {
             type="submit"
             className="flex items-center justify-center gap-1"
           >
-            Lägg till spelare <Plus size={16} />
+            Lägg till i matchen <Plus size={16} />
           </Button>
         </form>
 
         <TableProvider
           values={{ players: scoredPlayers, updatePlayer: handleUpdatePlayer }}
         >
-          <form className="flex flex-col gap-2" action={handleUpdateScores}>
+          <form className="flex flex-col gap-2" action={handleRemovePlayer}>
             <DataTable columns={columns} data={scoredPlayers} />
             <div className="flex justify-between items-center">
               <Button
-                type="submit"
+                onClick={handleUpdateScores}
                 className="flex items-center gap-2"
                 variant="secondary"
                 size="sm"

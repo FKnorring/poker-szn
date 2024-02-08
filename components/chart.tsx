@@ -17,6 +17,18 @@ interface ChartProps {
   players: Player[];
 }
 
+type PlayerNames = {
+  [id: string]: string;
+};
+
+type PlayerData = {
+  [name: string]: number;
+};
+
+type GameData = {
+  name: string;
+} & PlayerData;
+
 function stringToColorHash(name: string): string {
   // Simple hash function
   let hash = 0;
@@ -36,17 +48,20 @@ function stringToColorHash(name: string): string {
 }
 
 export default function Chart({ games, players }: ChartProps) {
-  const playerNames = players.reduce((acc, { name, id }) => {
+  const playerNames: PlayerNames = players.reduce((acc, { name, id }) => {
     return { [id]: name, ...acc };
   }, {});
-  const data = [...new Array(games.length)];
+  const data: GameData[] = [...new Array(games.length)];
 
   games
     .sort((a, b) => a.date.getTime() - b.date.getTime())
     .forEach((game, i) => {
-      const players = Object.values(playerNames).reduce((acc, name) => {
-        return { [name]: 0, ...acc };
-      }, {});
+      const players: PlayerData = Object.values(playerNames).reduce(
+        (acc, name) => {
+          return { [name]: 0, ...acc };
+        },
+        {}
+      );
       if (i !== 0) {
         const prev = { ...data[i - 1] };
         delete prev.name;
@@ -75,6 +90,7 @@ export default function Chart({ games, players }: ChartProps) {
         <Legend />
         {Object.values(playerNames).map((name) => (
           <Line
+            key={name}
             type="monotone"
             dataKey={name}
             stroke={stringToColorHash(name)}

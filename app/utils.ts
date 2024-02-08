@@ -79,9 +79,9 @@ export async function addPlayerToGame(playerId: number, gameId: number) {
   return { game, score };
 }
 
-export function removePlayerFromGame(playerId: number, gameId: number) {
+export async function removePlayerFromGame(playerId: number, gameId: number) {
   const prisma = new PrismaClient();
-  const game = prisma.game.update({
+  const game = await prisma.game.update({
     where: { id: gameId },
     data: {
       players: {
@@ -91,7 +91,7 @@ export function removePlayerFromGame(playerId: number, gameId: number) {
       },
     },
   });
-  const score = prisma.score.deleteMany({
+  const score = await prisma.score.deleteMany({
     where: {
       playerId,
       gameId,
