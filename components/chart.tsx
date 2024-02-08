@@ -64,14 +64,17 @@ export default function Chart({ games, players }: ChartProps) {
       );
       if (i !== 0) {
         const prev = { ...data[i - 1] };
+        // @ts-ignore
         delete prev.name;
         Object.entries(prev).forEach(([name, score]) => {
+          // @ts-ignore
           players[name] = score;
         });
       }
       game.scores.forEach(({ playerId, stack, buyins }) => {
         players[playerNames[playerId]] += stack - buyins * 100;
       });
+      // @ts-ignore
       data[i] = { name: game.date.toLocaleDateString("sv-SE"), ...players };
     });
 
