@@ -4,7 +4,7 @@ import { useOptimistic, useRef, useState } from "react";
 import { EditGameProvider, useEditGame } from "./context";
 import { getNonAssignedPlayers, getPlayerScores } from "./utils";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronRight, Plus } from "lucide-react";
+import { ChevronDown, ChevronRight, Plus, X } from "lucide-react";
 import { handleAddGame, handleAddPlayerToGame } from "./api";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -69,10 +69,11 @@ export default function Games({ games, players }: GamesProps) {
               <CollapsibleTrigger
                 role="button"
                 onClick={() => selectGame(game.id)}
-                className="w-full flex justify-between"
+                className="w-full flex gap-2 justify-between items-center"
               >
                 <ListGame game={game} />
                 {game.id === selectedGame ? <ChevronDown /> : <ChevronRight />}
+                <X color="red" />
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <GameDetails game={game} />
