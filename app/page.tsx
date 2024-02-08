@@ -11,7 +11,9 @@ export default async function Home() {
   const scores = await getScores();
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <Link href="/edit">Hantera Matcher</Link>
+      <Button>
+        <Link href="/edit">Hantera Matcher</Link>
+      </Button>
       <Chart games={games} players={players} />
     </main>
   );
