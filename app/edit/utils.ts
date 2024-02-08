@@ -9,7 +9,7 @@ export function getNonAssignedPlayers(
   );
 }
 
-export type ExtendedPlayer = Player & { score: number };
+export type ExtendedPlayer = Player & { buyins: number; stack: number };
 
 export function getPlayerScores(
   scores: Score[],
@@ -19,7 +19,8 @@ export function getPlayerScores(
     const score = scores.find((score) => score.playerId === player.id);
     return {
       ...player,
-      score: score?.score || 0,
+      buyins: score?.buyins || 0,
+      stack: score?.stack || 0,
     };
   });
 }

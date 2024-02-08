@@ -16,6 +16,8 @@ model Game {
   date    DateTime
   players Player[]
   scores  Score[]
+
+  @@unique([date], name: "_date")
 }
 
 model Score {
@@ -24,7 +26,8 @@ model Score {
   gameId   Int
   player   Player @relation(fields: [playerId], references: [id])
   playerId Int
-  score    Float
+  buyins   Float
+  stack    Float
 
   @@unique([gameId, playerId], name: "playerId_gameId")
 }

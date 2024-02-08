@@ -57,7 +57,8 @@ export async function addPlayerToGame(playerId: number, gameId: number) {
   });
   const score = await prisma.score.create({
     data: {
-      score: 0,
+      buyins: 1,
+      stack: 0,
       game: {
         connect: {
           id: gameId,
@@ -95,12 +96,12 @@ export function removePlayerFromGame(playerId: number, gameId: number) {
 }
 
 export function updateScores(
-  scores: { playerId: number; score: number }[],
+  scores: { playerId: number; buyins: number; stack: number }[],
   gameId: number
 ) {
   const prisma = new PrismaClient();
 
-  const transactions = scores.map(({ playerId, score }) =>
+  const transactions = scores.map(({ playerId, buyins, stack }) =>
     prisma.score.update({
       where: {
         playerId_gameId: {
@@ -109,7 +110,8 @@ export function updateScores(
         },
       },
       data: {
-        score,
+        buyins,
+        stack,
       },
     })
   );
