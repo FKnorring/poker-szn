@@ -12,6 +12,11 @@ export function getGames() {
   });
 }
 
+export function getScores() {
+  const prisma = new PrismaClient();
+  return prisma.score.findMany();
+}
+
 export function getGame(id: number) {
   const prisma = new PrismaClient();
   return prisma.game.findUnique({
