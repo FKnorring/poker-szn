@@ -62,11 +62,11 @@ export default function GameDetails({ game }: { game: ExtendedGame }) {
     const player = players.find((player) => player.name === name);
     if (gamePlayers.some((p) => p.id === player?.id)) return;
     if (!player) {
-      const { player, score } = await handleAddNewPlayerToGame(name, game.id);
+      const { player } = await handleAddNewPlayerToGame(name, game.id);
       setGamePlayers((players) => [...players, player]);
       setScoredPlayers((players) => [
         ...players,
-        { ...player, buyins: 1, stack: 0 },
+        { ...player, buyins: 1, stack: 100 },
       ]);
       return toast(`Ny spelare ${name} har lagts till i matchen!`, {
         description: new Date().toLocaleTimeString("sv-SE"),
@@ -76,7 +76,7 @@ export default function GameDetails({ game }: { game: ExtendedGame }) {
     setGamePlayers((players) => [...players, player]);
     setScoredPlayers((players) => [
       ...players,
-      { ...player, buyins: 1, stack: 0 },
+      { ...player, buyins: 1, stack: 100 },
     ]);
     toast(`${name} har lagts till i matchen!`, {
       description: new Date().toLocaleTimeString("sv-SE"),

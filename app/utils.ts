@@ -58,7 +58,7 @@ export async function addPlayerToGame(playerId: number, gameId: number) {
   const score = await prisma.score.create({
     data: {
       buyins: 1,
-      stack: 0,
+      stack: 100,
       game: {
         connect: {
           id: gameId,
