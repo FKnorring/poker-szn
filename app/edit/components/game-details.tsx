@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Save, SaveIcon } from "lucide-react";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
+import { toast } from "sonner";
 
 export default function GameDetails({ game }: { game: ExtendedGame }) {
   const { players } = useEditGame();
@@ -30,18 +31,24 @@ export default function GameDetails({ game }: { game: ExtendedGame }) {
   const nonAssignedPlayers = getNonAssignedPlayers(players, gamePlayers);
   const scoredPlayers = getPlayerScores(game.scores, gamePlayers);
 
-  function handleAddPlayer(formData: FormData) {
+  async function handleAddPlayer(formData: FormData) {
     const name = formData.get("player") as string;
     if (!name) return;
     const player = players.find((player) => player.name === name);
     if (gamePlayers.some((p) => p.id === player?.id)) return;
     if (!player) {
-      return handleAddNewPlayerToGame(name, game.id);
+      await handleAddNewPlayerToGame(name, game.id);
+      return toast(`Ny spelare ${name} har lagts till i matchen!`, {
+        description: new Date().toLocaleTimeString("sv-SE"),
+      });
     }
-    handleAddPlayerToGame(player.id, game.id);
+    await handleAddPlayerToGame(player.id, game.id);
+    toast(`${name} har lagts till i matchen!`, {
+      description: new Date().toLocaleTimeString("sv-SE"),
+    });
   }
 
-  function handleUpdateScores(formData: FormData) {
+  async function handleUpdateScores(formData: FormData) {
     const scores = scoredPlayers.map((player) => {
       const score = formData.get(`score-${player.id}`) as string;
       return {
@@ -49,7 +56,10 @@ export default function GameDetails({ game }: { game: ExtendedGame }) {
         score: Number(score),
       };
     });
-    handleUpdateGameScores(scores, game.id);
+    await handleUpdateGameScores(scores, game.id);
+    toast("Utfallen har sparats!", {
+      description: new Date().toLocaleTimeString("sv-SE"),
+    });
   }
 
   return (

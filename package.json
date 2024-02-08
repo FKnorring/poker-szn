@@ -23,10 +23,12 @@
     "date-fns": "^3.3.1",
     "lucide-react": "^0.323.0",
     "next": "14.1.0",
+    "next-themes": "^0.2.1",
     "prisma": "^5.9.1",
     "react": "^18",
     "react-day-picker": "^8.10.0",
     "react-dom": "^18",
+    "sonner": "^1.4.0",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7"
   },
