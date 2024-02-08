@@ -73,7 +73,6 @@ export default function Games({ games, players }: GamesProps) {
               >
                 <ListGame game={game} />
                 {game.id === selectedGame ? <ChevronDown /> : <ChevronRight />}
-                <X color="red" />
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <GameDetails game={game} />

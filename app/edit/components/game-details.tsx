@@ -17,7 +17,7 @@ import {
 import { ExtendedGame } from "../games";
 import AutoComplete from "./autocomplete";
 import { Button } from "@/components/ui/button";
-import { Plus, Save, SaveIcon } from "lucide-react";
+import { Plus, Save, SaveIcon, X } from "lucide-react";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { toast } from "sonner";
@@ -119,11 +119,12 @@ export default function GameDetails({ game }: { game: ExtendedGame }) {
         >
           <form className="flex flex-col gap-2" action={handleUpdateScores}>
             <DataTable columns={columns} data={scoredPlayers} />
-            <div className="flex justify-between">
+            <div className="flex justify-between items-center">
               <Button
                 type="submit"
                 className="flex items-center gap-2"
-                variant="destructive"
+                variant="secondary"
+                size="sm"
               >
                 Spara <SaveIcon size={16} />
               </Button>
@@ -137,6 +138,16 @@ export default function GameDetails({ game }: { game: ExtendedGame }) {
                   </span>
                 </div>
               </div>
+            </div>
+            <div className="flex content-end">
+              <Button
+                type="submit"
+                className="flex items-center gap-2"
+                variant="destructive"
+                size="sm"
+              >
+                Ta bort match <X size={16} />
+              </Button>
             </div>
           </form>
         </TableProvider>
