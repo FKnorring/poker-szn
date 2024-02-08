@@ -114,7 +114,7 @@ export default function LinePlot({ games, players, scores }: LinePlotProps) {
       <g transform={`translate(0,${height - margin.bottom})`}>
         {x.ticks().map((tick) => (
           <line
-            key={tick}
+            key={tick.toDateString()}
             x1={x(tick)}
             y1={0}
             x2={x(tick)}
