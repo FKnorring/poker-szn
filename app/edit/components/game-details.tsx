@@ -1,7 +1,7 @@
 import { Game, Player, Score } from "@prisma/client";
 import { TableProvider, useEditGame } from "../context";
 import { useOptimistic, useRef, useState } from "react";
-import { getNonAssignedPlayers, getPlayerScores } from "../utils";
+import { getGameMoney, getNonAssignedPlayers, getPlayerScores } from "../utils";
 import {
   handleAddPlayerToGame,
   handleAddNewPlayerToGame,
@@ -29,11 +29,7 @@ export default function GameDetails({ game }: { game: ExtendedGame }) {
     getPlayerScores(game.scores, gamePlayers)
   );
 
-  const moneyIn = scoredPlayers.reduce(
-    (acc, player) => acc + player.buyins * 100,
-    0
-  );
-  const moneyOut = scoredPlayers.reduce((acc, player) => acc + player.stack, 0);
+  const { moneyIn, moneyOut } = getGameMoney(scoredPlayers);
 
   const nonAssignedPlayers = getNonAssignedPlayers(players, gamePlayers);
 

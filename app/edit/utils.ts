@@ -24,3 +24,12 @@ export function getPlayerScores(
     };
   });
 }
+
+export const getGameMoney = (scoredPlayers: ExtendedPlayer[]) => {
+  const moneyIn = scoredPlayers.reduce(
+    (acc, player) => acc + player.buyins * 100,
+    0
+  );
+  const moneyOut = scoredPlayers.reduce((acc, player) => acc + player.stack, 0);
+  return { moneyIn, moneyOut };
+};

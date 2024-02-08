@@ -28,6 +28,7 @@ interface GamesProps {
 
 export default function Games({ games, players }: GamesProps) {
   const [selectedGame, setSelectedGame] = useState<number | null>(null);
+  const [_players, setPlayers] = useState(players);
   const [_games, setGames] = useState(games);
 
   function selectGame(gameId: number) {
@@ -49,7 +50,7 @@ export default function Games({ games, players }: GamesProps) {
   }
 
   return (
-    <EditGameProvider values={{ players }}>
+    <EditGameProvider values={{ players, setPlayers }}>
       <div className="flex flex-col gap-2">
         <form className="flex gap-2" action={handleAddNewGame}>
           <DatePicker />

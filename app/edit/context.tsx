@@ -4,6 +4,7 @@ import { ExtendedPlayer } from "./utils";
 
 interface EditGameContextProps {
   players: Player[];
+  setPlayers: React.Dispatch<React.SetStateAction<Player[]>>;
 }
 
 export const EditGameContext = createContext<EditGameContextProps>(
