@@ -9,9 +9,9 @@ interface LinePlotProps {
 }
 
 export default function LinePlot({ games, players, scores }: LinePlotProps) {
-  const width = 800;
+  const width = 1000;
   const height = 800;
-  const margin = { top: 20, right: 20, bottom: 50, left: 50 };
+  const margin = { top: 20, right: 160, bottom: 50, left: 50 };
   const dates = games
     .map(({ date }) => new Date(date))
     .sort((a, b) => a.getTime() - b.getTime());
@@ -19,7 +19,7 @@ export default function LinePlot({ games, players, scores }: LinePlotProps) {
   let minScore = Infinity;
   let maxScore = -Infinity;
 
-  const playerData: { player: string; date: Date; total: number }[][] = [
+  const playerData: { name: string; date: Date; total: number }[][] = [
     ...Array(players.length),
   ].map(() => [...Array(games.length)]);
 
@@ -41,10 +41,22 @@ export default function LinePlot({ games, players, scores }: LinePlotProps) {
         maxScore = Math.max(maxScore, total);
         playerData[j][i] = {
           date: new Date(date),
-          player: player.name,
+          name: player.name,
           total,
         };
       });
+    });
+
+  const highestTotalPerDate: { date: Date; name: string; total: number }[] =
+    dates.map((date, i) => {
+      const playersOnDate = playerData.map((player) => player[i]);
+      const highestTotal = playersOnDate.reduce((acc, player) => {
+        if (player.total > acc.total) {
+          return player;
+        }
+        return acc;
+      }, playersOnDate[0]);
+      return { date, name: highestTotal.name, total: highestTotal.total };
     });
 
   const x = d3
@@ -64,8 +76,15 @@ export default function LinePlot({ games, players, scores }: LinePlotProps) {
     .x((d) => x(d.date))
     .y((d) => y(d.total));
 
+  const legendOffset = {
+    x: width - margin.right + 40, // Position of the legend on the X axis
+    y: margin.top, // Starting position of the legend on the Y axis
+    gap: 20, // Gap between legend items
+  };
+
   return (
     <svg width={width} height={height}>
+      {/* Draw the axis labels */}
       <g>
         {x.ticks().map((tick) => (
           <text
@@ -91,6 +110,40 @@ export default function LinePlot({ games, players, scores }: LinePlotProps) {
           </text>
         ))}
       </g>
+      {/* Draw the axes */}
+      <g transform={`translate(0,${height - margin.bottom})`}>
+        {x.ticks().map((tick) => (
+          <line
+            key={tick}
+            x1={x(tick)}
+            y1={0}
+            x2={x(tick)}
+            y2={-(height - margin.top - margin.bottom)}
+            stroke="lightgrey"
+          />
+        ))}
+        <path
+          d={`M${margin.left},0H${width - margin.right}`}
+          stroke="currentColor"
+        />
+      </g>
+      <g transform={`translate(${margin.left},0)`}>
+        {y.ticks().map((tick) => (
+          <line
+            key={tick}
+            x1={0}
+            y1={y(tick)}
+            x2={width - margin.left - margin.right}
+            y2={y(tick)}
+            stroke="lightgrey"
+          />
+        ))}
+        <path
+          d={`M0,${margin.top}V${height - margin.bottom}`}
+          stroke="currentColor"
+        />
+      </g>
+      {/* Draw the lines for each player */}
       {playerData.map((player, idx) => (
         <path
           key={idx}
@@ -100,6 +153,29 @@ export default function LinePlot({ games, players, scores }: LinePlotProps) {
           strokeWidth="2"
         />
       ))}
+      {/* Highlight the player with the highest total on each date */}
+      {highestTotalPerDate.map((data, idx) => (
+        <g key={idx} className="highest-total">
+          <circle cx={x(data.date)} cy={y(data.total)} r="5" fill="red" />
+          <text x={x(data.date) + 5} y={y(data.total) - 10} fontSize="12">
+            {`${data.name}: ${data.total}`}
+          </text>
+        </g>
+      ))}
+      {/*Legend*/}
+      <g transform={`translate(${legendOffset.x},${legendOffset.y})`}>
+        {players.map((player, idx) => (
+          <g
+            key={player.id}
+            transform={`translate(0,${idx * legendOffset.gap})`}
+          >
+            <rect width="15" height="15" fill={d3.schemeTableau10[idx % 10]} />
+            <text x="20" y="12" fontSize="12">
+              {player.name}
+            </text>
+          </g>
+        ))}
+      </g>
     </svg>
   );
 }
