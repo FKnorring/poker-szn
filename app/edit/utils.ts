@@ -9,7 +9,7 @@ export function getNonAssignedPlayers(
   );
 }
 
-type ExtendedPlayer = Player & { score: number };
+export type ExtendedPlayer = Player & { score: number };
 
 export function getPlayerScores(
   scores: Score[],

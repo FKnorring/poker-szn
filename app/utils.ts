@@ -37,6 +37,12 @@ export function addGame(date: Date) {
   });
 }
 
+export async function addNewPlayerToGame(name: string, gameId: number) {
+  const player = await addPlayer(name);
+  const { game, score } = await addPlayerToGame(player.id, gameId);
+  return { player, game, score };
+}
+
 export async function addPlayerToGame(playerId: number, gameId: number) {
   const prisma = new PrismaClient();
   const game = await prisma.game.update({
@@ -86,4 +92,27 @@ export function removePlayerFromGame(playerId: number, gameId: number) {
     },
   });
   return { game, score };
+}
+
+export function updateScores(
+  scores: { playerId: number; score: number }[],
+  gameId: number
+) {
+  const prisma = new PrismaClient();
+
+  const transactions = scores.map(({ playerId, score }) =>
+    prisma.score.update({
+      where: {
+        playerId_gameId: {
+          gameId,
+          playerId,
+        },
+      },
+      data: {
+        score,
+      },
+    })
+  );
+
+  return prisma.$transaction(transactions);
 }

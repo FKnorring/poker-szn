@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Game {
@@ -24,6 +25,8 @@ model Score {
   player   Player @relation(fields: [playerId], references: [id])
   playerId Int
   score    Float
+
+  @@unique([gameId, playerId], name: "playerId_gameId")
 }
 
 model Player {

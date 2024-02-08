@@ -1,80 +1,28 @@
 "use client";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Game, Player, Score } from "@prisma/client";
 import { useOptimistic, useRef, useState } from "react";
 import { EditGameProvider, useEditGame } from "./context";
 import { getNonAssignedPlayers, getPlayerScores } from "./utils";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import { handleAddPlayerToGame } from "./api";
+import { ChevronDown, ChevronRight, Plus } from "lucide-react";
+import { handleAddGame, handleAddPlayerToGame } from "./api";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/datepicker";
+import GameDetails from "./components/game-details";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import ListGame from "./components/list-game";
 
-type ExtendedGame = Game & { players: Player[] } & { scores: Score[] };
+export type ExtendedGame = Game & { players: Player[] } & { scores: Score[] };
 
 interface GamesProps {
   games: ExtendedGame[];
   players: Player[];
-}
-
-function GameDetails({ game }: { game: ExtendedGame }) {
-  const { players } = useEditGame();
-  const [gamePlayers, addGamePlayer] = useOptimistic(
-    game.players,
-    (state: Player[], player: Player) => [...state, player]
-  );
-  const formRef = useRef<HTMLFormElement | null>(null);
-  const nonAssignedPlayers = getNonAssignedPlayers(players, gamePlayers);
-  const scoredPlayers = getPlayerScores(game.scores, gamePlayers);
-
-  return (
-    <div>
-      <h2>Players</h2>
-      <ul>
-        {scoredPlayers.map((player) => (
-          <li key={player.id}>
-            {player.name} {player.score}
-          </li>
-        ))}
-      </ul>
-      <div className="flex gap-2">
-        <form
-          ref={formRef}
-          action={(formData) => {
-            const playerId = parseInt(formData.get("player") as string);
-            const player = players.find((player) => player.id === playerId);
-            if (!player) return;
-            addGamePlayer(player);
-            handleAddPlayerToGame(game.id, playerId);
-          }}
-        >
-          <Select
-            onValueChange={() => {
-              formRef.current?.requestSubmit();
-            }}
-            name="player"
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Lägg till spelare" />
-            </SelectTrigger>
-            <SelectContent>
-              {nonAssignedPlayers.map((player) => (
-                <SelectItem key={player.id} value={player.id.toString()}>
-                  {player.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </form>
-      </div>
-    </div>
-  );
 }
 
 export default function Games({ games, players }: GamesProps) {
@@ -82,33 +30,57 @@ export default function Games({ games, players }: GamesProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const gameId = searchParams.get("game");
+  const [selectedGame, setSelectedGame] = useState<number | null>(
+    gameId ? parseInt(gameId) : null
+  );
 
-  function selectGame(gameId: string) {
+  function selectGame(gameId: number) {
+    if (gameId === selectedGame) {
+      setSelectedGame(null);
+      router.push(pathname);
+      return;
+    }
+    setSelectedGame(gameId);
     router.push(`${pathname}?game=${gameId}`);
   }
 
-  function findGame(id: string) {
-    return games.find((game) => game.id === parseInt(id));
-  }
-
-  const game = gameId ? findGame(gameId) : null;
-
   return (
     <EditGameProvider values={{ players }}>
-      <div>
-        <Select onValueChange={selectGame}>
-          <SelectTrigger>
-            <SelectValue placeholder="Välj en match" />
-          </SelectTrigger>
-          <SelectContent>
-            {games.map((game) => (
-              <SelectItem key={game.id} value={game.id.toString()}>
-                {new Date(game.date).toLocaleDateString()}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {game && <GameDetails game={game} />}
+      <div className="flex flex-col gap-2">
+        <form
+          className="flex gap-2"
+          action={(formData) => {
+            const date = formData.get("date") as string;
+            if (!date) return;
+            handleAddGame(date);
+          }}
+        >
+          <DatePicker />
+          <Button
+            type="submit"
+            className="flex items-center justify-center gap-1"
+          >
+            Lägg till match <Plus size={16} />
+          </Button>
+        </form>
+        <div className="flex flex-col gap-2">
+          {games.map((game) => (
+            <Collapsible
+              key={game.id}
+              role="button"
+              className="border py-4 px-6 rounded-md flex flex-col shadow-sm"
+              onClick={() => selectGame(game.id)}
+            >
+              <CollapsibleTrigger className="w-full flex justify-between">
+                <ListGame game={game} />
+                {game.id === selectedGame ? <ChevronDown /> : <ChevronRight />}
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <GameDetails game={game} />
+              </CollapsibleContent>
+            </Collapsible>
+          ))}
+        </div>
       </div>
     </EditGameProvider>
   );
