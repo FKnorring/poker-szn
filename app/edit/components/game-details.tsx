@@ -29,6 +29,12 @@ export default function GameDetails({ game }: { game: ExtendedGame }) {
     getPlayerScores(game.scores, gamePlayers)
   );
 
+  const moneyIn = scoredPlayers.reduce(
+    (acc, player) => acc + player.buyins * 100,
+    0
+  );
+  const moneyOut = scoredPlayers.reduce((acc, player) => acc + player.stack, 0);
+
   const nonAssignedPlayers = getNonAssignedPlayers(players, gamePlayers);
 
   function handleUpdatePlayer(
@@ -113,13 +119,25 @@ export default function GameDetails({ game }: { game: ExtendedGame }) {
         >
           <form className="flex flex-col gap-2" action={handleUpdateScores}>
             <DataTable columns={columns} data={scoredPlayers} />
-            <Button
-              type="submit"
-              className="flex items-center gap-2"
-              variant="destructive"
-            >
-              Spara <SaveIcon size={16} />
-            </Button>
+            <div className="flex justify-between">
+              <Button
+                type="submit"
+                className="flex items-center gap-2"
+                variant="destructive"
+              >
+                Spara <SaveIcon size={16} />
+              </Button>
+              <div className="flex items-center">
+                <div className="flex gap-2 items-center">
+                  <span className="px-2 py-1 bg-orange-800 text-xs text-background font-bold m-0  rounded-md">
+                    Pengar in: {moneyIn} kr
+                  </span>
+                  <span className="px-2 py-1 bg-lime-800 text-xs text-background font-bold m-0 rounded-md">
+                    Pengar ut: {moneyOut} kr
+                  </span>
+                </div>
+              </div>
+            </div>
           </form>
         </TableProvider>
       </div>
