@@ -37,4 +37,6 @@ model Player {
   name  String
   Games Game[]
   Score Score[]
+
+  @@unique([name], name: "_name")
 }
