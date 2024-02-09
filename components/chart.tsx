@@ -49,7 +49,7 @@ interface ChartProps {
   renderPlayer: (payload: Payload) => JSX.Element;
 }
 
-export default function Chart({ games, players, renderPlayer }: ChartProps) {
+export function extractGameData(games: ExtendedGame[], players: Player[]) {
   const playerNames: PlayerNames = players.reduce((acc, { name, id }) => {
     return { [id]: name, ...acc };
   }, {});
@@ -85,6 +85,11 @@ export default function Chart({ games, players, renderPlayer }: ChartProps) {
         ...players,
       };
     });
+  return data;
+}
+
+export default function Chart({ games, players, renderPlayer }: ChartProps) {
+  const data = extractGameData(games, players);
 
   return (
     <ResponsiveContainer width="100%" className="flex-grow">
@@ -110,7 +115,7 @@ export default function Chart({ games, players, renderPlayer }: ChartProps) {
             );
           }}
         />
-        {Object.values(playerNames).map((name) => (
+        {players.map(({ name }) => (
           <Line
             key={name}
             type="monotone"

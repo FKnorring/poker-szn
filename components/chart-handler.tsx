@@ -1,7 +1,7 @@
 "use client";
 
 import { ExtendedGame } from "@/app/edit/games";
-import Chart, { stringToColorHash } from "./chart";
+import Chart, { extractGameData, stringToColorHash } from "./chart";
 import { Player } from "@prisma/client";
 import { useState } from "react";
 import {
@@ -33,6 +33,16 @@ function DrawPlayer({ name, onClick }: { name: string; onClick: () => void }) {
   );
 }
 
+function getTop12Players(games: ExtendedGame[], players: Player[]) {
+  const data = extractGameData(games, players);
+  const latest = data[data.length - 1];
+  // @ts-ignore
+  delete latest.name;
+  // @ts-ignore
+  const sorted = Object.entries(latest).sort((a, b) => b[1] - a[1]);
+  return sorted.slice(0, 12).map(([name]) => name);
+}
+
 export default function ChartHandler({ games, players }: ChartHandlerProps) {
   const [showPlayers, setshowPlayers] = useState(
     new Set<string>(players.map(({ name }) => name))
@@ -51,6 +61,11 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
   function handleSelectPlayersFromMatch(gameId: string) {
     if (gameId === "all") {
       setshowPlayers(new Set(players.map(({ name }) => name)));
+      return;
+    }
+    if (gameId === "top12") {
+      const top12 = getTop12Players(games, players);
+      setshowPlayers(new Set(top12));
       return;
     }
     const game = games.find((game) => game.id === Number(gameId));
@@ -78,11 +93,14 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Alla matcher</SelectItem>
-            {games.map((game) => (
-              <SelectItem key={game.id} value={game.id.toString()}>
-                {game.date.toLocaleDateString()}
-              </SelectItem>
-            ))}
+            <SelectItem value="top12">Top 12</SelectItem>
+            {games
+              .sort((a, b) => b.date.getTime() - a.date.getTime())
+              .map((game) => (
+                <SelectItem key={game.id} value={game.id.toString()}>
+                  {game.date.toLocaleDateString()}
+                </SelectItem>
+              ))}
           </SelectContent>
         </Select>
       </div>
