@@ -23,12 +23,12 @@ export default function Leaderboard({ games, players }: LeaderboardProps) {
     <div className="min-w-[250px] flex flex-col gap-4">
       <h3 className="text-xl font-bold">Leaderboard</h3>
       <Separator />
-      <ul className="flex flex-col">
+      <ul className="flex flex-col rounded-md overflow-hidden border">
         {topPlayers.map(([name, score], i) => (
           <li
             key={name}
-            className={`flex gap-2 items-center border-t shadow p-2 text-sm font-semibold ${
-              i < 3 ? colors[i] : ""
+            className={`flex gap-2 items-center shadow p-2 text-sm font-semibold ${
+              i < 3 ? colors[i] + " bg-opacity-50" : ""
             }`}
           >
             <span className="flex-grow">
