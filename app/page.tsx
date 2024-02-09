@@ -1,23 +1,26 @@
 import { Button } from "@/components/ui/button";
-import { addPlayer, addGame, getGames, getPlayers, getScores } from "./utils";
-import { Input } from "@/components/ui/input";
-import { DatePicker } from "@/components/ui/datepicker";
+import { getGames, getPlayers } from "./utils";
 import Link from "next/link";
 import ChartHandler from "@/components/chart-handler";
 import { Separator } from "@/components/ui/separator";
 import Leaderboard from "@/components/leaderboard";
+import { Calendar } from "lucide-react";
 
 export default async function Home() {
   const games = await getGames();
   const players = await getPlayers();
-  const scores = await getScores();
+
   return (
     <main className="flex h-screen flex-col p-12 gap-4">
       <div className="flex">
-        <h1 className="text-4xl font-bold flex-grow">Pokersäsongen VT 2024</h1>
+        <h1 className="text-4xl font-extrabold tracking-tight flex-grow">
+          Poker SZN VT 2024
+        </h1>
 
         <Link href="/edit">
-          <Button>Hantera Matcher </Button>
+          <Button className="gap-2">
+            Hantera Matcher <Calendar size={16} />
+          </Button>
         </Link>
       </div>
       <Separator />

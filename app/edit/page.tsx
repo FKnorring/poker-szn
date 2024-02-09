@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Games from "./games";
 import { Separator } from "@/components/ui/separator";
+import { BarChart2 } from "lucide-react";
 
 export default async function EditGames() {
   const _games = await getGames();
@@ -12,10 +13,14 @@ export default async function EditGames() {
   return (
     <main className="flex min-h-screen flex-col p-12 gap-4">
       <div className="flex">
-        <h1 className="text-4xl font-bold flex-grow">Hantera matcher</h1>
+        <h1 className="text-4xl font-extrabold tracking-tight flex-grow">
+          Hantera matcher
+        </h1>
 
         <Link href="/">
-          <Button>Till statistik</Button>
+          <Button className="gap-2">
+            Visa Statisik <BarChart2 size={16} />
+          </Button>
         </Link>
       </div>
       <Separator />
