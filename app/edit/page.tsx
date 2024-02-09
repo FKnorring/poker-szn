@@ -13,9 +13,10 @@ export default async function EditGames() {
     <main className="flex min-h-screen flex-col p-12 gap-4">
       <div className="flex">
         <h1 className="text-4xl font-bold flex-grow">Hantera matcher</h1>
-        <Button>
-          <Link href="/">Till statistik</Link>
-        </Button>
+
+        <Link href="/">
+          <Button>Till statistik</Button>
+        </Link>
       </div>
       <Separator />
       <Games games={games} players={players} />

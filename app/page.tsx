@@ -14,9 +14,10 @@ export default async function Home() {
     <main className="flex h-screen flex-col p-12 gap-4">
       <div className="flex">
         <h1 className="text-4xl font-bold flex-grow">Pokersäsongen VT 2024</h1>
-        <Button>
-          <Link href="/edit">Hantera Matcher</Link>
-        </Button>
+
+        <Link href="/edit">
+          <Button>Hantera Matcher </Button>
+        </Link>
       </div>
       <Separator />
       <div className="flex-grow flex h-full w-full flex-col gap-2">
