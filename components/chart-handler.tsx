@@ -22,7 +22,7 @@ function DrawPlayer({ name, onClick }: { name: string; onClick: () => void }) {
     <li
       onClick={onClick}
       role="button"
-      className="ms-2 my-[2px] px-2 py-1 border flex items-center gap-2 rounded-md"
+      className="ms-2 my-[2px] px-2 py-1 border flex items-center gap-2 rounded-md text-black"
     >
       <div
         className="w-4 h-4 rounded-full"

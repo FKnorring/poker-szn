@@ -97,7 +97,8 @@ export default function Chart({ games, players, renderPlayer }: ChartProps) {
         width={500}
         height={900}
         data={data}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+        margin={{ top: 30, right: 10, left: 0, bottom: 30 }}
+        className="bg-white rounded-md"
       >
         <XAxis dataKey="name" padding="gap" />
         <YAxis />
