@@ -4,7 +4,7 @@ import Link from "next/link";
 import ChartHandler from "@/components/chart-handler";
 import { Separator } from "@/components/ui/separator";
 import Leaderboard from "@/components/leaderboard";
-import { Calendar } from "lucide-react";
+import { Calendar, Spade, Heart, Diamond, Club } from "lucide-react";
 import { GeistMono } from "geist/font/mono";
 
 export default async function Home() {
@@ -12,15 +12,18 @@ export default async function Home() {
   const players = await getPlayers();
 
   return (
-    <main className="flex h-screen flex-col p-12 gap-4">
-      <div className="flex">
+    <main className="flex h-screen flex-col p-8 gap-4">
+      <div className="flex items-center gap-4">
         <h1
-          className={`text-4xl font-extrabold tracking-tight flex-grow ${GeistMono.className}`}
+          className={`text-4xl font-extrabold tracking-tight ${GeistMono.className}`}
         >
           POKER SZN VT_24
         </h1>
-
-        <Link href="/edit">
+        <Heart size={32} />
+        <Spade size={32} />
+        <Diamond size={32} />
+        <Club size={32} />
+        <Link className="ms-auto" href="/edit">
           <Button className="gap-2">
             Hantera Matcher <Calendar size={16} />
           </Button>

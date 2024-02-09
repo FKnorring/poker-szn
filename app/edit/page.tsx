@@ -5,6 +5,7 @@ import Games from "./games";
 import { Separator } from "@/components/ui/separator";
 import { BarChart2 } from "lucide-react";
 import { GeistMono } from "geist/font/mono";
+import { Heart, Spade, Diamond, Club } from "lucide-react";
 
 export default async function EditGames() {
   const _games = await getGames();
@@ -12,15 +13,18 @@ export default async function EditGames() {
   const players = await getPlayers();
 
   return (
-    <main className="flex min-h-screen flex-col p-12 gap-4">
-      <div className="flex">
+    <main className="flex h-screen flex-col p-8 gap-4">
+      <div className="flex items-center gap-4">
         <h1
-          className={`text-4xl font-extrabold tracking-tight flex-grow ${GeistMono.className}`}
+          className={`text-4xl font-extrabold tracking-tight ${GeistMono.className}`}
         >
           POKER SZN VT_24
         </h1>
-
-        <Link href="/">
+        <Heart size={32} />
+        <Spade size={32} />
+        <Diamond size={32} />
+        <Club size={32} />
+        <Link className="ms-auto" href="/">
           <Button className="gap-2">
             Visa Statisik <BarChart2 size={16} />
           </Button>
