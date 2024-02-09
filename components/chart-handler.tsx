@@ -73,6 +73,10 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
       setshowPlayers(new Set(top12));
       return;
     }
+    if (gameId === "none") {
+      setshowPlayers(new Set());
+      return;
+    }
     const game = games.find((game) => game.id === Number(gameId));
     if (!game) {
       return;
@@ -106,6 +110,7 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
                   {game.date.toLocaleDateString()}
                 </SelectItem>
               ))}
+            <SelectItem value="none">Rensa spelare</SelectItem>
           </SelectContent>
         </Select>
       </div>
