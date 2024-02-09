@@ -33,14 +33,19 @@ function DrawPlayer({ name, onClick }: { name: string; onClick: () => void }) {
   );
 }
 
-function getTop12Players(games: ExtendedGame[], players: Player[]) {
+export function getTopPlayers(games: ExtendedGame[], players: Player[]) {
   const data = extractGameData(games, players);
   const latest = data[data.length - 1];
   // @ts-ignore
   delete latest.name;
   // @ts-ignore
-  const sorted = Object.entries(latest).sort((a, b) => b[1] - a[1]);
-  return sorted.slice(0, 12).map(([name]) => name);
+  return Object.entries(latest).sort((a, b) => b[1] - a[1]);
+}
+
+function getTop12Players(games: ExtendedGame[], players: Player[]) {
+  return getTopPlayers(games, players)
+    .slice(0, 12)
+    .map(([name]) => name);
 }
 
 export default function ChartHandler({ games, players }: ChartHandlerProps) {

@@ -5,6 +5,7 @@ import { DatePicker } from "@/components/ui/datepicker";
 import Link from "next/link";
 import ChartHandler from "@/components/chart-handler";
 import { Separator } from "@/components/ui/separator";
+import Leaderboard from "@/components/leaderboard";
 
 export default async function Home() {
   const games = await getGames();
@@ -20,8 +21,12 @@ export default async function Home() {
         </Link>
       </div>
       <Separator />
-      <div className="flex-grow flex h-full w-full flex-col gap-2">
-        <ChartHandler games={games} players={players} />
+      <div className="flex flex-grow gap-4">
+        <div className="flex-grow flex h-full w-full flex-col gap-2">
+          <ChartHandler games={games} players={players} />
+        </div>
+        <Separator orientation="vertical" />
+        <Leaderboard games={games} players={players} />
       </div>
     </main>
   );
