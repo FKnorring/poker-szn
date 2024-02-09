@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import Leaderboard from "@/components/leaderboard";
 import { Calendar, Spade, Heart, Diamond, Club } from "lucide-react";
 import { GeistMono } from "geist/font/mono";
+import { ModeToggle } from "@/components/toggle-theme";
 
 export default async function Home() {
   const games = await getGames();
@@ -23,7 +24,10 @@ export default async function Home() {
         <Spade size={32} />
         <Diamond size={32} />
         <Club size={32} />
-        <Link className="ms-auto" href="/edit">
+        <div className="ms-auto">
+          <ModeToggle />
+        </div>
+        <Link href="/edit">
           <Button className="gap-2">
             Hantera Matcher <Calendar size={16} />
           </Button>
