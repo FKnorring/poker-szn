@@ -11,11 +11,7 @@ import {
 } from "recharts";
 import { ExtendedGame } from "@/app/edit/games";
 import { Player } from "@prisma/client";
-
-interface ChartProps {
-  games: ExtendedGame[];
-  players: Player[];
-}
+import { Payload } from "recharts/types/component/DefaultLegendContent";
 
 type PlayerNames = {
   [id: string]: string;
@@ -29,7 +25,7 @@ type GameData = {
   name: string;
 } & PlayerData;
 
-function stringToColorHash(name: string): string {
+export function stringToColorHash(name: string): string {
   // Simple hash function
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
@@ -47,7 +43,13 @@ function stringToColorHash(name: string): string {
   return color;
 }
 
-export default function Chart({ games, players }: ChartProps) {
+interface ChartProps {
+  games: ExtendedGame[];
+  players: Player[];
+  renderPlayer: (payload: Payload) => JSX.Element;
+}
+
+export default function Chart({ games, players, renderPlayer }: ChartProps) {
   const playerNames: PlayerNames = players.reduce((acc, { name, id }) => {
     return { [id]: name, ...acc };
   }, {});
@@ -90,7 +92,18 @@ export default function Chart({ games, players }: ChartProps) {
         <YAxis />
         <CartesianGrid strokeDasharray="3 3" />
         <Tooltip />
-        <Legend />
+        <Legend
+          align="right"
+          verticalAlign="middle"
+          layout="vertical"
+          content={({ payload }) => {
+            return (
+              <ul className="flex flex-col">
+                {payload?.map((entry) => renderPlayer(entry))}
+              </ul>
+            );
+          }}
+        />
         {Object.values(playerNames).map((name) => (
           <Line
             key={name}

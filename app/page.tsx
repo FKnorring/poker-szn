@@ -3,7 +3,7 @@ import { addPlayer, addGame, getGames, getPlayers, getScores } from "./utils";
 import { Input } from "@/components/ui/input";
 import { DatePicker } from "@/components/ui/datepicker";
 import Link from "next/link";
-import Chart from "@/components/chart";
+import ChartHandler from "@/components/chart-handler";
 
 export default async function Home() {
   const games = await getGames();
@@ -14,7 +14,7 @@ export default async function Home() {
       <Button>
         <Link href="/edit">Hantera Matcher</Link>
       </Button>
-      <Chart games={games} players={players} />
+      <ChartHandler games={games} players={players} />
     </main>
   );
 }
