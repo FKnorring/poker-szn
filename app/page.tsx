@@ -13,9 +13,9 @@ export default async function Home() {
 
   return (
     <main className="flex h-screen flex-col p-8 gap-4">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2">
         <h1
-          className={`text-4xl font-extrabold tracking-tight ${GeistMono.className}`}
+          className={`text-4xl font-extrabold tracking-widest ${GeistMono.className}`}
         >
           POKER SZN VT_24
         </h1>
