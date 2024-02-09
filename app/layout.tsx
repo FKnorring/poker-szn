@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Poker SZN 2024",
+  title: "Poker SZN 24",
   description: "Tracking av pokersäsongen 2024 Jan-Jun.",
 };
 

@@ -5,6 +5,7 @@ import ChartHandler from "@/components/chart-handler";
 import { Separator } from "@/components/ui/separator";
 import Leaderboard from "@/components/leaderboard";
 import { Calendar } from "lucide-react";
+import { GeistMono } from "geist/font/mono";
 
 export default async function Home() {
   const games = await getGames();
@@ -13,8 +14,10 @@ export default async function Home() {
   return (
     <main className="flex h-screen flex-col p-12 gap-4">
       <div className="flex">
-        <h1 className="text-4xl font-extrabold tracking-tight flex-grow">
-          Poker SZN VT 2024
+        <h1
+          className={`text-4xl font-extrabold tracking-tight flex-grow ${GeistMono.className}`}
+        >
+          POKER SZN VT_24
         </h1>
 
         <Link href="/edit">
