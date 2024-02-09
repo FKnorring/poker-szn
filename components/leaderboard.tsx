@@ -14,10 +14,10 @@ interface LeaderboardProps {
 export default function Leaderboard({ games, players }: LeaderboardProps) {
   const topPlayers = getTopPlayers(games, players);
 
-  const gold = "bg-yellow-300";
-  const silver = "bg-gray-300";
-  const bronze = "bg-orange-800";
-  const danger = "bg-red-500";
+  const gold = "bg-amber-300";
+  const silver = "bg-slate-300";
+  const bronze = "bg-amber-800";
+  const danger = "bg-red-300";
 
   const colors = [gold, silver, bronze];
 
