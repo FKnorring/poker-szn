@@ -12,8 +12,8 @@ export default function ListGame({ game }: { game: ExtendedGame }) {
       <h2>{game.date.toLocaleDateString("sv-SE")}</h2>
       <div className="flex items-center gap-4">
         <div className="flex gap-2">
-          <span className="text-green-500">{moneyIn}</span>+/-
-          <span className="text-red-500">{moneyOut}</span>
+          <span className="text-green-500">{moneyOut}</span>+/-
+          <span className="text-red-500">{moneyIn}</span>
         </div>
         <div className="flex items-center">
           {game.players.length} <User size={16} />
