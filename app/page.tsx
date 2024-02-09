@@ -19,7 +19,7 @@ export default async function Home() {
         </Button>
       </div>
       <Separator />
-      <div className="flex-grow flex h-full w-full flex-col">
+      <div className="flex-grow flex h-full w-full flex-col gap-2">
         <ChartHandler games={games} players={players} />
       </div>
     </main>

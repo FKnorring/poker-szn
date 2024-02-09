@@ -4,6 +4,13 @@ import { ExtendedGame } from "@/app/edit/games";
 import Chart, { stringToColorHash } from "./chart";
 import { Player } from "@prisma/client";
 import { useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ChartHandlerProps {
   games: ExtendedGame[];
@@ -27,23 +34,58 @@ function DrawPlayer({ name, onClick }: { name: string; onClick: () => void }) {
 }
 
 export default function ChartHandler({ games, players }: ChartHandlerProps) {
-  const [hidePlayers, setHidePlayers] = useState(new Set<string>());
+  const [showPlayers, setshowPlayers] = useState(
+    new Set<string>(players.map(({ name }) => name))
+  );
 
   function filterPlayer(name: string) {
-    const newSet = new Set(hidePlayers);
+    const newSet = new Set(showPlayers);
     if (newSet.has(name)) {
       newSet.delete(name);
     } else {
       newSet.add(name);
     }
-    setHidePlayers(newSet);
+    setshowPlayers(newSet);
   }
 
-  const filteredPlayers = players.filter(({ name }) => !hidePlayers.has(name));
-  const unfilteredPlayers = players.filter(({ name }) => hidePlayers.has(name));
+  function handleSelectPlayersFromMatch(gameId: string) {
+    if (gameId === "all") {
+      setshowPlayers(new Set(players.map(({ name }) => name)));
+      return;
+    }
+    const game = games.find((game) => game.id === Number(gameId));
+    if (!game) {
+      return;
+    }
+    const newSet = new Set<string>();
+    game.players.forEach((player) => {
+      newSet.add(player.name);
+    });
+    setshowPlayers(newSet);
+  }
+
+  const filteredPlayers = players.filter(({ name }) => showPlayers.has(name));
+  const unfilteredPlayers = players.filter(
+    ({ name }) => !showPlayers.has(name)
+  );
 
   return (
     <>
+      <div>
+        <Select onValueChange={handleSelectPlayersFromMatch}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Välj spelare från match" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Alla matcher</SelectItem>
+            {games.map((game) => (
+              <SelectItem key={game.id} value={game.id.toString()}>
+                {game.date.toLocaleDateString()}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
       <div className="flex flex-wrap">
         {unfilteredPlayers.map(({ name }) => (
           <DrawPlayer
