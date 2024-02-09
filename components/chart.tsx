@@ -77,18 +77,24 @@ export default function Chart({ games, players, renderPlayer }: ChartProps) {
         players[playerNames[playerId]] += stack - buyins * 100;
       });
       // @ts-ignore
-      data[i] = { name: game.date.toLocaleDateString("sv-SE"), ...players };
+      data[i] = {
+        name: game.date.toLocaleDateString("sv-SE", {
+          month: "short",
+          day: "2-digit",
+        }),
+        ...players,
+      };
     });
 
   return (
-    <ResponsiveContainer width="100%" height={600}>
+    <ResponsiveContainer width="100%" className="flex-grow">
       <LineChart
         width={500}
-        height={600}
+        height={900}
         data={data}
         margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
       >
-        <XAxis dataKey="name" />
+        <XAxis dataKey="name" padding="gap" />
         <YAxis />
         <CartesianGrid strokeDasharray="3 3" />
         <Tooltip />

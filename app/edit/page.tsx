@@ -1,5 +1,8 @@
 import { getGames, getPlayers } from "@/app/utils";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import Games from "./games";
+import { Separator } from "@/components/ui/separator";
 
 export default async function EditGames() {
   const _games = await getGames();
@@ -7,9 +10,14 @@ export default async function EditGames() {
   const players = await getPlayers();
 
   return (
-    <main className="flex min-h-screen flex-col p-24 gap-4">
-      <h1 className="text-4xl font-bold">Hantera matcher</h1>
-      <hr />
+    <main className="flex min-h-screen flex-col p-12 gap-4">
+      <div className="flex">
+        <h1 className="text-4xl font-bold flex-grow">Hantera matcher</h1>
+        <Button>
+          <Link href="/">Till statistik</Link>
+        </Button>
+      </div>
+      <Separator />
       <Games games={games} players={players} />
     </main>
   );
