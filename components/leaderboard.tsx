@@ -17,6 +17,7 @@ export default function Leaderboard({ games, players }: LeaderboardProps) {
   const gold = "bg-yellow-300";
   const silver = "bg-gray-300";
   const bronze = "bg-orange-800";
+  const danger = "bg-red-500";
 
   const colors = [gold, silver, bronze];
 
@@ -32,7 +33,11 @@ export default function Leaderboard({ games, players }: LeaderboardProps) {
           <li
             key={name}
             className={`flex gap-2 items-center shadow p-2 text-sm font-semibold ${
-              i < 3 ? colors[i] + " bg-opacity-50" : ""
+              i < 3
+                ? colors[i] + " bg-opacity-50"
+                : i > 11
+                ? danger + " bg-opacity-25"
+                : ""
             }`}
           >
             <span className="flex-grow">
