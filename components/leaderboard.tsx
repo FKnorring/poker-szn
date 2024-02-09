@@ -4,6 +4,7 @@ import { ExtendedGame } from "@/app/edit/games";
 import { Player } from "@prisma/client";
 import { getTopPlayers } from "./chart-handler";
 import { Separator } from "./ui/separator";
+import { Trophy } from "lucide-react";
 
 interface LeaderboardProps {
   games: ExtendedGame[];
@@ -21,7 +22,10 @@ export default function Leaderboard({ games, players }: LeaderboardProps) {
 
   return (
     <div className="min-w-[250px] flex flex-col gap-4">
-      <h3 className="text-xl font-bold">Leaderboard</h3>
+      <div className="flex items-center">
+        <h3 className="text-xl font-bold">Leaderboard</h3>
+        <Trophy className="ms-auto" />
+      </div>
       <Separator />
       <ul className="flex flex-col rounded-md overflow-hidden border">
         {topPlayers.map(([name, score], i) => (
