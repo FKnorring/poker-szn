@@ -115,15 +115,20 @@ export default function Chart({ games, players, renderPlayer }: ChartProps) {
             );
           }}
         />
-        {players.map(({ name }) => (
-          <Line
-            key={name}
-            type="monotone"
-            dataKey={name}
-            stroke={stringToColorHash(name)}
-            activeDot={{ r: 8 }}
-          />
-        ))}
+        {players
+          .sort(
+            (a, b) =>
+              data[data.length - 1][b.name] - data[data.length - 1][a.name]
+          )
+          .map(({ name }) => (
+            <Line
+              key={name}
+              type="monotone"
+              dataKey={name}
+              stroke={stringToColorHash(name)}
+              activeDot={{ r: 8 }}
+            />
+          ))}
       </LineChart>
     </ResponsiveContainer>
   );
