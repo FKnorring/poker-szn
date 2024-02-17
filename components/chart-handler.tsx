@@ -52,6 +52,10 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
   const [showPlayers, setshowPlayers] = useState(
     new Set<string>(players.map(({ name }) => name))
   );
+  const [interval, setInterval] = useState<[Date | string, Date | string]>([
+    "0",
+    "0",
+  ]);
 
   function filterPlayer(name: string) {
     const newSet = new Set(showPlayers);
@@ -93,9 +97,20 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
     ({ name }) => !showPlayers.has(name)
   );
 
+  const gamesInInterval = games.filter((game) => {
+    const [from, to] = interval;
+    if (from === "0" || to === "0") {
+      return true;
+    }
+    return (
+      game.date.getTime() >= new Date(from).getTime() &&
+      game.date.getTime() <= new Date(to).getTime()
+    );
+  });
+
   return (
     <>
-      <div>
+      <div className="flex gap-2">
         <Select onValueChange={handleSelectPlayersFromMatch}>
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="Välj spelare från match" />
@@ -111,6 +126,44 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
                 </SelectItem>
               ))}
             <SelectItem value="none">Rensa spelare</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select
+          onValueChange={(value) =>
+            setInterval(([from, to]) => [new Date(value), to])
+          }
+        >
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Från" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={"0"}>Alla matcher</SelectItem>
+            {games
+              .sort((a, b) => b.date.getTime() - a.date.getTime())
+              .map((game) => (
+                <SelectItem key={game.id} value={game.date.toDateString()}>
+                  {game.date.toLocaleDateString()}
+                </SelectItem>
+              ))}
+          </SelectContent>
+        </Select>
+        <Select
+          onValueChange={(value) =>
+            setInterval(([from, to]) => [from, new Date(value)])
+          }
+        >
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Till" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={"0"}>Alla matcher</SelectItem>
+            {games
+              .sort((a, b) => b.date.getTime() - a.date.getTime())
+              .map((game) => (
+                <SelectItem key={game.id} value={game.date.toDateString()}>
+                  {game.date.toLocaleDateString()}
+                </SelectItem>
+              ))}
           </SelectContent>
         </Select>
       </div>
