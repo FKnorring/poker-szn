@@ -11,6 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTheme } from "next-themes";
+import { Badge } from "./ui/badge";
 
 interface ChartHandlerProps {
   games: ExtendedGame[];
@@ -18,25 +20,20 @@ interface ChartHandlerProps {
 }
 
 function DrawPlayer({ name, onClick }: { name: string; onClick: () => void }) {
-  const windowWidth = window.innerWidth;
-  console.log(windowWidth);
   return (
-    <li
-      onClick={onClick}
-      role="button"
-      className="ms-2 my-[2px] p-1 border flex items-center gap-2 rounded-md text-black"
-    >
-      <div
-        className="w-4 h-4 rounded-full"
+    <li onClick={onClick} role="button" className="ms-2">
+      <Badge
+        variant="outline"
         style={{ backgroundColor: stringToColorHash(name) }}
-      ></div>
-      <span className="text-xs font-bold hidden lg:block">{name}</span>
-      <span className="text-xs font-bold block lg:hidden">
-        {name
-          .split(" ")
-          .map((c) => c[0])
-          .join("")}
-      </span>
+      >
+        <span className="text-xs font-bold hidden lg:block">{name}</span>
+        <span className="text-xs font-bold block lg:hidden">
+          {name
+            .split(" ")
+            .map((c) => c[0])
+            .join("")}
+        </span>
+      </Badge>
     </li>
   );
 }
@@ -60,6 +57,7 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
   const [showPlayers, setshowPlayers] = useState(
     new Set<string>(players.map(({ name }) => name))
   );
+  const { theme } = useTheme();
   const [interval, setInterval] = useState<[Date | string, Date | string]>([
     "0",
     "0",
@@ -137,7 +135,7 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
           </SelectContent>
         </Select>
       </div>
-      <div className="flex flex-wrap">
+      <ul className="flex flex-wrap">
         {unfilteredPlayers.map(({ name }) => (
           <DrawPlayer
             key={name}
@@ -145,7 +143,7 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
             onClick={() => filterPlayer(name)}
           />
         ))}
-      </div>
+      </ul>
       <Chart
         games={games}
         players={filteredPlayers}
