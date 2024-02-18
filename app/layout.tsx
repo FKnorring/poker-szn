@@ -31,8 +31,8 @@ export default function RootLayout({
         </ThemeProvider>
         <SpeedInsights />
         <Analytics />
+        <Toaster />
       </body>
-      <Toaster />
     </html>
   );
 }
