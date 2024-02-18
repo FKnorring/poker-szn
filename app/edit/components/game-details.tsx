@@ -121,7 +121,7 @@ export default function GameDetails({ game }: { game: ExtendedGame }) {
             type="submit"
             className="flex items-center justify-center gap-1"
           >
-            Lägg till i matchen <Plus size={16} />
+            Lägg till <Plus size={16} />
           </Button>
         </form>
 

@@ -22,23 +22,53 @@ interface EditableCellProps {
 }
 
 function EditableCell({ id, type, amount }: EditableCellProps) {
-  const { updatePlayer } = useTable();
+  const { updatePlayer, players } = useTable();
+
+  function increment(value: number) {
+    const currentBuyins = players.find((p) => p.id === id)?.buyins;
+    if (currentBuyins === undefined) return;
+    updatePlayer(id, currentBuyins + value, undefined);
+  }
+
+  const incrementers = (
+    <>
+      <Button
+        className="aspect-square"
+        onClick={() => increment(0.5)}
+        size="icon"
+        variant="outline"
+      >
+        +.5
+      </Button>
+      <Button
+        className="aspect-square"
+        onClick={() => increment(1)}
+        size="icon"
+        variant="outline"
+      >
+        +1
+      </Button>
+    </>
+  );
 
   return (
-    <Input
-      className="w-24"
-      name={`${type}-${id}`}
-      type="number"
-      value={amount}
-      onChange={(e) => {
-        const value = e.target.value;
-        updatePlayer(
-          id,
-          type === "buyins" ? +value : undefined,
-          type === "stack" ? +value : undefined
-        );
-      }}
-    />
+    <div className="flex">
+      <Input
+        className="min-w-12"
+        name={`${type}-${id}`}
+        type="number"
+        value={amount}
+        onChange={(e) => {
+          const value = e.target.value;
+          updatePlayer(
+            id,
+            type === "buyins" ? +value : undefined,
+            type === "stack" ? +value : undefined
+          );
+        }}
+      />
+      {type === "buyins" && incrementers}
+    </div>
   );
 }
 
