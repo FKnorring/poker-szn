@@ -6,8 +6,45 @@ import { Separator } from "@/components/ui/separator";
 import { BarChart2 } from "lucide-react";
 import { GeistMono } from "geist/font/mono";
 import { Heart, Spade, Diamond, Club } from "lucide-react";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import { LoginLink } from "@kinde-oss/kinde-auth-nextjs/components";
 
 export default async function EditGames() {
+  const { isAuthenticated, getPermissions } = getKindeServerSession();
+
+  const authenticated = await isAuthenticated();
+  if (!authenticated) {
+    return (
+      <div className="flex items-center justify-center h-full gap-4 flex-col">
+        <h1 className="text-4xl font-extrabold tracking-widest">
+          POKER SZN VT_24
+        </h1>
+        <LoginLink className="text-lg text-center">
+          Logga in för att se statistik och lägga till matcher.
+        </LoginLink>
+      </div>
+    );
+  }
+
+  const permissions = await getPermissions();
+  if (permissions && !permissions.permissions.includes("edit")) {
+    return (
+      <div className="flex items-center justify-center h-full gap-4 flex-col">
+        <h1 className="text-4xl font-extrabold tracking-widest">
+          POKER SZN VT_24
+        </h1>
+        <p className="text-lg text-center">
+          Du har inte tillräckliga rättigheter för att redigera matcher.
+        </p>
+        <Link href="/">
+          <Button className="gap-2">
+            Gå tillbaka till statisik <BarChart2 size={16} />
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+
   const _games = await getGames();
   const games = _games.sort((a, b) => b.date.getTime() - a.date.getTime());
   const players = await getPlayers();
