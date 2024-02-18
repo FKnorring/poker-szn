@@ -18,17 +18,25 @@ interface ChartHandlerProps {
 }
 
 function DrawPlayer({ name, onClick }: { name: string; onClick: () => void }) {
+  const windowWidth = window.innerWidth;
+  console.log(windowWidth);
   return (
     <li
       onClick={onClick}
       role="button"
-      className="ms-2 my-[2px] px-2 py-1 border flex items-center gap-2 rounded-md text-black"
+      className="ms-2 my-[2px] p-1 border flex items-center gap-2 rounded-md text-black"
     >
       <div
         className="w-4 h-4 rounded-full"
         style={{ backgroundColor: stringToColorHash(name) }}
       ></div>
-      <span className="text-xs font-bold">{name}</span>
+      <span className="text-xs font-bold hidden lg:block">{name}</span>
+      <span className="text-xs font-bold block lg:hidden">
+        {name
+          .split(" ")
+          .map((c) => c[0])
+          .join("")}
+      </span>
     </li>
   );
 }
@@ -126,44 +134,6 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
                 </SelectItem>
               ))}
             <SelectItem value="none">Rensa spelare</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select
-          onValueChange={(value) =>
-            setInterval(([from, to]) => [new Date(value), to])
-          }
-        >
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Från" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={"0"}>Alla matcher</SelectItem>
-            {games
-              .sort((a, b) => b.date.getTime() - a.date.getTime())
-              .map((game) => (
-                <SelectItem key={game.id} value={game.date.toDateString()}>
-                  {game.date.toLocaleDateString()}
-                </SelectItem>
-              ))}
-          </SelectContent>
-        </Select>
-        <Select
-          onValueChange={(value) =>
-            setInterval(([from, to]) => [from, new Date(value)])
-          }
-        >
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Till" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={"0"}>Alla matcher</SelectItem>
-            {games
-              .sort((a, b) => b.date.getTime() - a.date.getTime())
-              .map((game) => (
-                <SelectItem key={game.id} value={game.date.toDateString()}>
-                  {game.date.toLocaleDateString()}
-                </SelectItem>
-              ))}
           </SelectContent>
         </Select>
       </div>

@@ -13,7 +13,7 @@ export default async function EditGames() {
   const players = await getPlayers();
 
   return (
-    <main className="flex h-screen flex-col p-8 gap-4">
+    <>
       <div className="flex items-center gap-2">
         <h1
           className={`text-4xl font-extrabold tracking-widest ${GeistMono.className}`}
@@ -32,7 +32,7 @@ export default async function EditGames() {
       </div>
       <Separator />
       <Games games={games} players={players} />
-    </main>
+    </>
   );
 }
 
