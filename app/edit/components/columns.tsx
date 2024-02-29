@@ -36,7 +36,7 @@ function EditableCell({ id, type, amount }: EditableCellProps) {
         className="aspect-square"
         onClick={() => increment(0.5)}
         size="icon"
-        variant="outline"
+        variant="secondary"
       >
         +.5
       </Button>
@@ -44,7 +44,7 @@ function EditableCell({ id, type, amount }: EditableCellProps) {
         className="aspect-square"
         onClick={() => increment(1)}
         size="icon"
-        variant="outline"
+        variant="destructive"
       >
         +1
       </Button>
@@ -57,7 +57,7 @@ function EditableCell({ id, type, amount }: EditableCellProps) {
   const minW = type === "buyins" ? buyinW : stackW;
 
   return (
-    <div className="flex">
+    <div className="flex gap-1">
       <Input
         className={`${minW} px-[6px] lg:px-3`}
         name={`${type}-${id}`}
