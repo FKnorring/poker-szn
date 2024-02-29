@@ -23,6 +23,7 @@ import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { toast } from "sonner";
 import Seating from "./seating";
+import { Badge } from "@/components/ui/badge";
 
 export default function GameDetails({ game }: { game: ExtendedGame }) {
   const { players } = useEditGame();
@@ -146,12 +147,8 @@ export default function GameDetails({ game }: { game: ExtendedGame }) {
               </Button>
               <div className="flex items-center">
                 <div className="flex gap-2 items-center">
-                  <span className="px-2 py-1 bg-orange-800 text-xs text-background font-bold m-0  rounded-md">
-                    Pengar in: {moneyIn} kr
-                  </span>
-                  <span className="px-2 py-1 bg-lime-800 text-xs text-background font-bold m-0 rounded-md">
-                    Pengar ut: {moneyOut} kr
-                  </span>
+                  <Badge variant="destructive">Pengar in: {moneyIn} kr</Badge>
+                  <Badge variant="secondary">Pengar ut: {moneyOut} kr</Badge>
                 </div>
               </div>
             </div>

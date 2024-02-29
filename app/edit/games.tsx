@@ -65,7 +65,7 @@ export default function Games({ games, players }: GamesProps) {
           {_games.map((game) => (
             <Collapsible
               key={game.id}
-              className="border py-4 px-2 lg:px-6 rounded-md flex flex-col shadow-sm"
+              className="border py-2 lg:py-4 px-2 lg:px-6 rounded-md flex flex-col shadow-sm"
             >
               <CollapsibleTrigger
                 role="button"
