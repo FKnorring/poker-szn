@@ -37,11 +37,11 @@ export default function Seating({ players }: SeatingProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Seating</Button>
+        <Button variant="outline">Placering</Button>
       </DialogTrigger>
       <DialogContent className="w-[95vw] rounded">
         <DialogHeader>
-          <DialogTitle>Seating</DialogTitle>
+          <DialogTitle>Placering</DialogTitle>
         </DialogHeader>
         <DialogDescription>
           <div className="relative w-[150px] h-[150px] rounded-full mx-auto bg-slate-900 my-16">
@@ -69,7 +69,7 @@ export default function Seating({ players }: SeatingProps) {
             })}
           </div>
           <Button className="float-right" onClick={randomize}>
-            Randomize
+            Slumpa platser
           </Button>
         </DialogDescription>
       </DialogContent>

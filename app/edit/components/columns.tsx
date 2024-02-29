@@ -51,10 +51,15 @@ function EditableCell({ id, type, amount }: EditableCellProps) {
     </>
   );
 
+  const buyinW = "min-w-8";
+  const stackW = "min-w-12";
+
+  const minW = type === "buyins" ? buyinW : stackW;
+
   return (
     <div className="flex">
       <Input
-        className="min-w-12"
+        className={`${minW} px-1 lg:px-3`}
         name={`${type}-${id}`}
         type="number"
         value={amount}
@@ -76,6 +81,19 @@ export const columns: ColumnDef<ExtendedPlayer>[] = [
   {
     accessorKey: "name",
     header: "Namn",
+    cell: ({ row }) => {
+      const { name } = row.original;
+      const [firstName, ...rest] = name.split(" ");
+      const shortenedSurname = `${firstName} ${rest
+        .map((word) => word.charAt(0))
+        .join("")}`;
+      return (
+        <>
+          <div className=" block lg:hidden">{shortenedSurname}</div>
+          <div className="hidden lg:block">{name}</div>
+        </>
+      );
+    },
   },
   {
     accessorKey: "buyins",

@@ -114,9 +114,12 @@ export default function GameDetails({ game }: { game: ExtendedGame }) {
       <hr className="my-4" />
       <div
         onClick={(e) => e.stopPropagation()}
-        className="flex flex-col gap-4 p-2"
+        className="flex flex-col gap-4 lg:p-2"
       >
-        <form action={handleAddPlayer} className="flex gap-2">
+        <form
+          action={handleAddPlayer}
+          className="flex flex-col lg:flex-row gap-2"
+        >
           <AutoComplete players={nonAssignedPlayers} />
           <Button
             type="submit"
@@ -132,7 +135,7 @@ export default function GameDetails({ game }: { game: ExtendedGame }) {
         >
           <form className="flex flex-col gap-2" action={handleRemovePlayer}>
             <DataTable columns={columns} data={scoredPlayers} />
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-2">
               <Button
                 onClick={handleUpdateScores}
                 className="flex items-center gap-2"
