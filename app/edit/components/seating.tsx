@@ -39,26 +39,23 @@ export default function Seating({ players }: SeatingProps) {
       <DialogTrigger asChild>
         <Button variant="outline">Seating</Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="w-[95vw] rounded">
         <DialogHeader>
           <DialogTitle>Seating</DialogTitle>
         </DialogHeader>
         <DialogDescription>
-          <div className="relative w-[300px] h-[200px] rounded-full mx-auto bg-slate-900">
+          <div className="relative w-[150px] h-[150px] rounded-full mx-auto bg-slate-900 my-16">
             {_players.map((player, i, arr) => {
-              const theta = ((2 * Math.PI) / arr.length) * i; // Angle for each player in radians
-              const radiusMult = 1.25;
-              const a = 150 * radiusMult; // Semi-major axis (half the width of the oval)
-              const b = 100 * radiusMult; // Semi-minor axis (half the height of the oval)
-
-              // Calculate the player's position on an ellipse
-              const playerX = a * Math.cos(theta);
-              const playerY = b * Math.sin(theta);
+              const angle = (360 / arr.length) * i; // Angle for each player
+              // Calculate the player's position on a circle
+              const radius = 100; // Adjust this value to move players closer or further from the center
+              const playerX = radius * Math.cos((angle * Math.PI) / 180);
+              const playerY = radius * Math.sin((angle * Math.PI) / 180);
 
               return (
                 <div
                   key={player.id}
-                  className="bg-slate-500 w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                  className="bg-slate-800 w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
                   style={{
                     position: "absolute",
                     left: `calc(50% + ${playerX}px)`,
@@ -71,7 +68,9 @@ export default function Seating({ players }: SeatingProps) {
               );
             })}
           </div>
-          <Button onClick={randomize}>Randomize</Button>
+          <Button className="float-right" onClick={randomize}>
+            Randomize
+          </Button>
         </DialogDescription>
       </DialogContent>
     </Dialog>
