@@ -51,7 +51,7 @@ function EditableCell({ id, type, amount }: EditableCellProps) {
     </>
   );
 
-  const buyinW = "min-w-8";
+  const buyinW = "min-w-10";
   const stackW = "min-w-12";
 
   const minW = type === "buyins" ? buyinW : stackW;
@@ -59,7 +59,7 @@ function EditableCell({ id, type, amount }: EditableCellProps) {
   return (
     <div className="flex">
       <Input
-        className={`${minW} px-1 lg:px-3`}
+        className={`${minW} px-[6px] lg:px-3`}
         name={`${type}-${id}`}
         type="number"
         value={amount}
