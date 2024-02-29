@@ -22,6 +22,7 @@ import { Plus, Save, SaveIcon, X } from "lucide-react";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { toast } from "sonner";
+import Seating from "./seating";
 
 export default function GameDetails({ game }: { game: ExtendedGame }) {
   const { players } = useEditGame();
@@ -123,6 +124,7 @@ export default function GameDetails({ game }: { game: ExtendedGame }) {
           >
             Lägg till <Plus size={16} />
           </Button>
+          <Seating players={gamePlayers} />
         </form>
 
         <TableProvider

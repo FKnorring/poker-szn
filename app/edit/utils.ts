@@ -4,9 +4,8 @@ export function getNonAssignedPlayers(
   allPlayers: Player[],
   attendingPlayers: Player[]
 ) {
-  return allPlayers.filter(
-    ({ id }) => !attendingPlayers.some((p) => p.id === id)
-  );
+  const attendingSet = new Set(attendingPlayers.map((p) => p.id));
+  return allPlayers.filter(({ id }) => !attendingSet.has(id));
 }
 
 export type ExtendedPlayer = Player & { buyins: number; stack: number };

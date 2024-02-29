@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -28,6 +28,10 @@ export default function AutoComplete({ players }: AutoCompleteProps) {
   const [value, setValue] = useState("");
   const [query, setQuery] = useState("");
   const [_players, setPlayers] = useState<Player[]>(players);
+
+  useEffect(() => {
+    setPlayers(players);
+  }, [players]);
 
   function addPlayer() {
     setPlayers((players) => {
