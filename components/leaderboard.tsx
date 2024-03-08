@@ -2,9 +2,11 @@
 
 import { ExtendedGame } from "@/app/edit/games";
 import { Player } from "@prisma/client";
-import { getTopPlayers } from "./chart-handler";
+import { getTop12WithMoreThanKGames, getTopPlayers } from "./chart-handler";
 import { Separator } from "./ui/separator";
 import { Trophy } from "lucide-react";
+import { useState } from "react";
+import { Button } from "./ui/button";
 
 interface LeaderboardProps {
   games: ExtendedGame[];
@@ -12,7 +14,9 @@ interface LeaderboardProps {
 }
 
 export default function Leaderboard({ games, players }: LeaderboardProps) {
+  const [moreThan3, setMoreThan3] = useState(false);
   const topPlayers = getTopPlayers(games, players);
+  const tournamentPlayers = getTop12WithMoreThanKGames(games, players, 3);
 
   const gold = "bg-amber-300";
   const silver = "bg-slate-300";
@@ -25,27 +29,35 @@ export default function Leaderboard({ games, players }: LeaderboardProps) {
     <div className="min-w-[250px] flex flex-col gap-4">
       <div className="flex items-center">
         <h3 className="text-xl font-bold">Leaderboard</h3>
-        <Trophy className="ms-auto" />
+        <Button
+          onClick={() => setMoreThan3((prev) => !prev)}
+          variant="outline"
+          className="p-0 aspect-square flex items-center justify-center ms-auto"
+        >
+          <Trophy />
+        </Button>
       </div>
       <Separator />
       <ul className="flex flex-col rounded-md overflow-hidden border">
-        {topPlayers.map(([name, score], i) => (
-          <li
-            key={name}
-            className={`flex gap-2 items-center shadow p-2 text-sm font-semibold ${
-              i < 3
-                ? colors[i] + " bg-opacity-50"
-                : i > 11
-                ? danger + " bg-opacity-25"
-                : ""
-            }`}
-          >
-            <span className="flex-grow">
-              {i + 1}. {name}
-            </span>
-            <span>{score} kr</span>
-          </li>
-        ))}
+        {(moreThan3 ? tournamentPlayers : topPlayers).map(
+          ([name, score], i) => (
+            <li
+              key={name}
+              className={`flex gap-2 items-center shadow p-2 text-sm font-semibold ${
+                i < 3
+                  ? colors[i] + " bg-opacity-50"
+                  : i > 11
+                  ? danger + " bg-opacity-25"
+                  : ""
+              }`}
+            >
+              <span className="flex-grow">
+                {i + 1}. {name}
+              </span>
+              <span>{score} kr</span>
+            </li>
+          )
+        )}
       </ul>
     </div>
   );

@@ -79,6 +79,17 @@ export async function addPlayerToGame(playerId: number, gameId: number) {
   return { game, score };
 }
 
+export async function removeGame(id: number) {
+  const prisma = new PrismaClient();
+  const score = await prisma.score.deleteMany({
+    where: { gameId: id },
+  });
+  const game = await prisma.game.delete({
+    where: { id },
+  });
+  return { game, score };
+}
+
 export async function removePlayerFromGame(playerId: number, gameId: number) {
   const prisma = new PrismaClient();
   const game = await prisma.game.update({

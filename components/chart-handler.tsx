@@ -47,6 +47,35 @@ export function getTopPlayers(games: ExtendedGame[], players: Player[]) {
   return Object.entries(latest).sort((a, b) => b[1] - a[1]);
 }
 
+export function getPlayersWithMoreThanKGames(
+  games: ExtendedGame[],
+  players: Player[],
+  k: number
+) {
+  const gamesPerPlayer = games.reduce((acc, game) => {
+    game.players.forEach((player) => {
+      if (acc[player.name]) {
+        acc[player.name]++;
+      } else {
+        acc[player.name] = 1;
+      }
+    });
+    return acc;
+  }, {} as { [name: string]: number });
+  return players.filter(({ name }) => gamesPerPlayer[name] > k);
+}
+
+export function getTop12WithMoreThanKGames(
+  games: ExtendedGame[],
+  players: Player[],
+  k: number
+) {
+  return getTopPlayers(
+    games,
+    getPlayersWithMoreThanKGames(games, players, k)
+  ).slice(0, 12);
+}
+
 function getTop12Players(games: ExtendedGame[], players: Player[]) {
   return getTopPlayers(games, players)
     .slice(0, 12)

@@ -5,6 +5,7 @@ import {
   addGame,
   updateScores,
   removePlayerFromGame,
+  removeGame,
 } from "@/app/utils";
 
 export async function handleAddPlayerToGame(playerId: number, gameId: number) {
@@ -37,4 +38,8 @@ export async function handleRemovePlayerFromGame(
   gameId: number
 ) {
   return await removePlayerFromGame(playerId, gameId);
+}
+
+export async function handleRemoveGame(id: number) {
+  return await removeGame(id);
 }

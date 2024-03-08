@@ -7,14 +7,8 @@ import {
   handleAddNewPlayerToGame,
   handleUpdateGameScores,
   handleRemovePlayerFromGame,
+  handleRemoveGame,
 } from "../api";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { ExtendedGame } from "../games";
 import AutoComplete from "./autocomplete";
 import { Button } from "@/components/ui/button";
@@ -110,6 +104,13 @@ export default function GameDetails({ game }: { game: ExtendedGame }) {
     });
   }
 
+  async function handleGameRemove() {
+    await handleRemoveGame(game.id);
+    toast("Matchen har tagits bort!", {
+      description: new Date().toLocaleTimeString("sv-SE"),
+    });
+  }
+
   return (
     <>
       <hr className="my-4" />
@@ -154,10 +155,10 @@ export default function GameDetails({ game }: { game: ExtendedGame }) {
             </div>
             <div className="flex content-end">
               <Button
-                type="submit"
                 className="flex items-center gap-2"
                 variant="destructive"
                 size="sm"
+                onClick={handleGameRemove}
               >
                 Ta bort match <X size={16} />
               </Button>
