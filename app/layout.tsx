@@ -25,7 +25,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <main className="flex h-screen flex-col p-3 lg:p-8 gap-4">
+          <main className="flex max-h-screen flex-col p-3 lg:p-8 gap-4">
             {children}
           </main>
         </ThemeProvider>

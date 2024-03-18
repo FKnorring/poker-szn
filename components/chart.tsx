@@ -8,6 +8,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  Brush,
 } from "recharts";
 import { ExtendedGame } from "@/app/edit/games";
 import { Player } from "@prisma/client";
@@ -94,8 +95,6 @@ export default function Chart({ games, players, renderPlayer }: ChartProps) {
   return (
     <ResponsiveContainer width="100%" className="flex-grow">
       <LineChart
-        width={500}
-        height={900}
         data={data}
         margin={{ top: 30, right: 10, left: 0, bottom: 30 }}
         className="bg-white rounded-md"
@@ -103,7 +102,21 @@ export default function Chart({ games, players, renderPlayer }: ChartProps) {
         <XAxis dataKey="name" padding="gap" />
         <YAxis />
         <CartesianGrid strokeDasharray="3 3" />
-        <Tooltip />
+        <Tooltip
+          content={({ active, payload, label }) => (
+            <div className="bg-white p-4 shadow-md rounded-md border">
+              <p className="text-sm font-bold">{label}</p>
+              <ul className="text-xs flex flex-col gap-1">
+                {payload?.map((entry) => (
+                  <li key={entry.dataKey}>
+                    {entry.dataKey}: {entry.value}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        />
+        <Brush dataKey="name" height={30} stroke="#8884d8" />
         <Legend
           align="right"
           verticalAlign="middle"

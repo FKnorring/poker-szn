@@ -51,7 +51,7 @@ export function getPlayersWithMoreThanKGames(
   games: ExtendedGame[],
   players: Player[],
   k: number
-) {
+): (Player & { games: number })[] {
   const gamesPerPlayer = games.reduce((acc, game) => {
     game.players.forEach((player) => {
       if (acc[player.name]) {
@@ -62,7 +62,9 @@ export function getPlayersWithMoreThanKGames(
     });
     return acc;
   }, {} as { [name: string]: number });
-  return players.filter(({ name }) => gamesPerPlayer[name] > k);
+  return players
+    .filter(({ name }) => name in gamesPerPlayer && gamesPerPlayer[name] > k)
+    .map((player) => ({ ...player, games: gamesPerPlayer[player.name] }));
 }
 
 export function getTop12WithMoreThanKGames(
@@ -70,10 +72,19 @@ export function getTop12WithMoreThanKGames(
   players: Player[],
   k: number
 ) {
-  return getTopPlayers(
+  const playersWithMoreThanKGames = getPlayersWithMoreThanKGames(
     games,
-    getPlayersWithMoreThanKGames(games, players, k)
-  ).slice(0, 12);
+    players,
+    k
+  );
+  return getTopPlayers(games, playersWithMoreThanKGames)
+    .slice(0, 12)
+    .map(([name, score]) => {
+      const player = playersWithMoreThanKGames.find(
+        (player) => player.name === name
+      );
+      return [name, score, player?.games];
+    });
 }
 
 function getTop12Players(games: ExtendedGame[], players: Player[]) {

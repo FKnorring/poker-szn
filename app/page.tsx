@@ -36,8 +36,8 @@ export default async function Home() {
         </Link>
       </div>
       <Separator />
-      <div className="flex flex-grow gap-4 flex-col lg:flex-row">
-        <div className="flex-grow flex min-h-[75dvh] h-full w-full flex-col gap-2">
+      <div className="flex gap-4 flex-col lg:flex-row">
+        <div className="flex min-h-[85dvh] h-full w-full flex-col gap-2">
           <ChartHandler games={games} players={players} />
         </div>
         <Separator orientation="horizontal" className="lg:hidden" />
