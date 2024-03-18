@@ -2,7 +2,7 @@
 
 import { ExtendedGame } from "@/app/edit/games";
 import { Player } from "@prisma/client";
-import { getTop12WithMoreThanKGames, getTopPlayers } from "./chart-handler";
+import { getTop12WithMoreThanKGames, getTopPlayers } from "./chart-utils";
 import { Separator } from "./ui/separator";
 import { Trophy } from "lucide-react";
 import { useState } from "react";

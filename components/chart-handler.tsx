@@ -1,9 +1,8 @@
 "use client";
 
 import { ExtendedGame } from "@/app/edit/games";
-import Chart, { extractGameData, stringToColorHash } from "./chart";
 import { Player } from "@prisma/client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -13,7 +12,14 @@ import {
 } from "@/components/ui/select";
 import { useTheme } from "next-themes";
 import { Badge } from "./ui/badge";
-
+import { stringToColorHash, getTop12Players } from "./chart-utils";
+import TotalChart from "./total-chart";
+import { SelectProps } from "@radix-ui/react-select";
+import WinRateChart from "./winrate-chart";
+import BuyinStackChart from "./buyin-stack-chart";
+import WinLossChart from "./win-loss-chart";
+import { Play, Pause } from "lucide-react";
+import { Button } from "./ui/button";
 interface ChartHandlerProps {
   games: ExtendedGame[];
   players: Player[];
@@ -38,70 +44,79 @@ function DrawPlayer({ name, onClick }: { name: string; onClick: () => void }) {
   );
 }
 
-export function getTopPlayers(games: ExtendedGame[], players: Player[]) {
-  const data = extractGameData(games, players);
-  const latest = data[data.length - 1];
-  // @ts-ignore
-  delete latest.name;
-  // @ts-ignore
-  return Object.entries(latest).sort((a, b) => b[1] - a[1]);
+interface GameSelectProps extends SelectProps {
+  games: ExtendedGame[];
 }
 
-export function getPlayersWithMoreThanKGames(
-  games: ExtendedGame[],
-  players: Player[],
-  k: number
-): (Player & { games: number })[] {
-  const gamesPerPlayer = games.reduce((acc, game) => {
-    game.players.forEach((player) => {
-      if (acc[player.name]) {
-        acc[player.name]++;
-      } else {
-        acc[player.name] = 1;
-      }
-    });
-    return acc;
-  }, {} as { [name: string]: number });
-  return players
-    .filter(({ name }) => name in gamesPerPlayer && gamesPerPlayer[name] > k)
-    .map((player) => ({ ...player, games: gamesPerPlayer[player.name] }));
-}
-
-export function getTop12WithMoreThanKGames(
-  games: ExtendedGame[],
-  players: Player[],
-  k: number
-) {
-  const playersWithMoreThanKGames = getPlayersWithMoreThanKGames(
-    games,
-    players,
-    k
+function GameSelect({ games, ...props }: GameSelectProps) {
+  return (
+    <Select {...props}>
+      <SelectTrigger className="w-[200px]">
+        <SelectValue placeholder="Välj spelare från match" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="all">Alla matcher</SelectItem>
+        <SelectItem value="top12">Top 12</SelectItem>
+        {games
+          .sort((a, b) => b.date.getTime() - a.date.getTime())
+          .map((game) => (
+            <SelectItem key={game.id} value={game.id.toString()}>
+              {game.date.toLocaleDateString()}
+            </SelectItem>
+          ))}
+        <SelectItem value="none">Rensa spelare</SelectItem>
+      </SelectContent>
+    </Select>
   );
-  return getTopPlayers(games, playersWithMoreThanKGames)
-    .slice(0, 12)
-    .map(([name, score]) => {
-      const player = playersWithMoreThanKGames.find(
-        (player) => player.name === name
-      );
-      return [name, score, player?.games];
-    });
 }
 
-function getTop12Players(games: ExtendedGame[], players: Player[]) {
-  return getTopPlayers(games, players)
-    .slice(0, 12)
-    .map(([name]) => name);
+function ChartSelect({ ...props }: SelectProps) {
+  return (
+    <Select {...props}>
+      <SelectTrigger className="w-[200px]">
+        <SelectValue placeholder="Välj diagram" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="total">Total</SelectItem>
+        <SelectItem value="winrate">Vinsthalt</SelectItem>
+        <SelectItem value="winloss">Vinst/Förlust</SelectItem>
+        <SelectItem value="buyinStack">Avg Buyin / Stack</SelectItem>
+      </SelectContent>
+    </Select>
+  );
 }
+
+const charts = {
+  total: TotalChart,
+  winrate: WinRateChart,
+  winloss: WinLossChart,
+  buyinStack: BuyinStackChart,
+};
 
 export default function ChartHandler({ games, players }: ChartHandlerProps) {
   const [showPlayers, setshowPlayers] = useState(
     new Set<string>(players.map(({ name }) => name))
   );
-  const { theme } = useTheme();
-  const [interval, setInterval] = useState<[Date | string, Date | string]>([
-    "0",
-    "0",
-  ]);
+
+  const [chart, setChart] = useState<
+    "total" | "winrate" | "winloss" | "buyinStack"
+  >("total");
+
+  const [slideshow, setSlideshow] = useState(false);
+
+  useEffect(() => {
+    if (!slideshow) return;
+    const interval = setInterval(() => {
+      setChart((prev) => {
+        if (prev === "total") return "winrate";
+        if (prev === "winrate") return "winloss";
+        if (prev === "winloss") return "buyinStack";
+        if (prev === "buyinStack") return "total";
+        return "total";
+      });
+    }, 15000);
+    return () => clearInterval(interval);
+  }, [slideshow]);
 
   function filterPlayer(name: string) {
     const newSet = new Set(showPlayers);
@@ -143,37 +158,20 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
     ({ name }) => !showPlayers.has(name)
   );
 
-  const gamesInInterval = games.filter((game) => {
-    const [from, to] = interval;
-    if (from === "0" || to === "0") {
-      return true;
-    }
-    return (
-      game.date.getTime() >= new Date(from).getTime() &&
-      game.date.getTime() <= new Date(to).getTime()
-    );
-  });
-
   return (
     <>
       <div className="flex gap-2">
-        <Select onValueChange={handleSelectPlayersFromMatch}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Välj spelare från match" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Alla matcher</SelectItem>
-            <SelectItem value="top12">Top 12</SelectItem>
-            {games
-              .sort((a, b) => b.date.getTime() - a.date.getTime())
-              .map((game) => (
-                <SelectItem key={game.id} value={game.id.toString()}>
-                  {game.date.toLocaleDateString()}
-                </SelectItem>
-              ))}
-            <SelectItem value="none">Rensa spelare</SelectItem>
-          </SelectContent>
-        </Select>
+        <GameSelect
+          games={games}
+          onValueChange={handleSelectPlayersFromMatch}
+        />
+        <ChartSelect onValueChange={setChart} />
+        <Button
+          onClick={() => setSlideshow((prev) => !prev)}
+          className="p-2 aspect-square rounded-md cursor-pointer"
+        >
+          {slideshow ? <Pause /> : <Play />}
+        </Button>
       </div>
       <ul className="flex flex-wrap">
         {unfilteredPlayers.map(({ name }) => (
@@ -184,16 +182,16 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
           />
         ))}
       </ul>
-      <Chart
-        games={games}
-        players={filteredPlayers}
-        renderPlayer={(entry) => (
+      {charts[chart]({
+        games,
+        players: filteredPlayers,
+        renderPlayer: (entry) => (
           <DrawPlayer
             name={entry.value}
             onClick={() => filterPlayer(entry.value)}
           />
-        )}
-      />
+        ),
+      })}
     </>
   );
 }
