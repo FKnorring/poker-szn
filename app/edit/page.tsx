@@ -72,6 +72,3 @@ export default async function EditGames() {
     </>
   );
 }
-
-export const revalidate = 60;
-export const dynamic = "force-dynamic";

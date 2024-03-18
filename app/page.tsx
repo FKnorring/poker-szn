@@ -4,7 +4,7 @@ import Link from "next/link";
 import ChartHandler from "@/components/chart-handler";
 import { Separator } from "@/components/ui/separator";
 import Leaderboard from "@/components/leaderboard";
-import { Calendar, Spade, Heart, Diamond, Club } from "lucide-react";
+import { Calendar, Spade, Heart, Diamond, Club, Coins } from "lucide-react";
 import { GeistMono } from "geist/font/mono";
 import { ModeToggle } from "@/components/toggle-theme";
 
@@ -29,6 +29,12 @@ export default async function Home() {
         <div className="ms-auto">
           <ModeToggle />
         </div>
+        <Link href="/play">
+          <Button variant="destructive" className="gap-1">
+            <Coins size={16} />
+            Spela
+          </Button>
+        </Link>
         <Link href="/edit">
           <Button size="icon">
             <Calendar size={16} />
@@ -47,6 +53,3 @@ export default async function Home() {
     </>
   );
 }
-
-export const revalidate = 60;
-export const dynamic = "force-dynamic";

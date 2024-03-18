@@ -1,4 +1,9 @@
 import { PrismaClient } from "@prisma/client";
+import { revalidatePath } from "next/cache";
+
+export function revalidateAll() {
+  revalidatePath("/", "layout");
+}
 
 export function getPlayers() {
   const prisma = new PrismaClient();
@@ -24,27 +29,32 @@ export function getGame(id: number) {
   });
 }
 
-export function addPlayer(name: string) {
+export async function addPlayer(name: string) {
   const prisma = new PrismaClient();
-  return prisma.player.create({
+  const res = await prisma.player.create({
     data: {
       name,
     },
   });
+  revalidateAll();
+  return res;
 }
 
-export function addGame(date: Date) {
+export async function addGame(date: Date) {
   const prisma = new PrismaClient();
-  return prisma.game.create({
+  const res = await prisma.game.create({
     data: {
       date,
     },
   });
+  revalidateAll();
+  return res;
 }
 
 export async function addNewPlayerToGame(name: string, gameId: number) {
   const player = await addPlayer(name);
   const { game, score } = await addPlayerToGame(player.id, gameId);
+  revalidateAll();
   return { player, game, score };
 }
 
@@ -76,6 +86,7 @@ export async function addPlayerToGame(playerId: number, gameId: number) {
       },
     },
   });
+  revalidateAll();
   return { game, score };
 }
 
@@ -87,6 +98,7 @@ export async function removeGame(id: number) {
   const game = await prisma.game.delete({
     where: { id },
   });
+  revalidateAll();
   return { game, score };
 }
 
@@ -108,10 +120,11 @@ export async function removePlayerFromGame(playerId: number, gameId: number) {
       gameId,
     },
   });
+  revalidateAll();
   return { game, score };
 }
 
-export function updateScores(
+export async function updateScores(
   scores: { playerId: number; buyins: number; stack: number }[],
   gameId: number
 ) {
@@ -131,6 +144,45 @@ export function updateScores(
       },
     })
   );
+  const res = await prisma.$transaction(transactions);
+  revalidateAll();
+  return res;
+}
 
-  return prisma.$transaction(transactions);
+export async function updateScore({
+  playerId,
+  buyins,
+  stack,
+  gameId,
+}: {
+  playerId: number;
+  buyins: number;
+  stack: number;
+  gameId: number;
+}) {
+  const prisma = new PrismaClient();
+  const res = await prisma.score.update({
+    where: {
+      playerId_gameId: {
+        gameId,
+        playerId,
+      },
+    },
+    data: {
+      buyins,
+      stack,
+    },
+  });
+  revalidateAll();
+  return res;
+}
+
+export function fetchLatestGame() {
+  const prisma = new PrismaClient();
+  return prisma.game.findFirst({
+    include: { players: true, scores: true },
+    orderBy: {
+      date: "desc",
+    },
+  });
 }
