@@ -160,7 +160,7 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
 
   return (
     <>
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         <GameSelect
           games={games}
           onValueChange={handleSelectPlayersFromMatch}
