@@ -165,6 +165,7 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
           games={games}
           onValueChange={handleSelectPlayersFromMatch}
         />
+        {/** @ts-ignore */}
         <ChartSelect onValueChange={setChart} />
         <Button
           onClick={() => setSlideshow((prev) => !prev)}
