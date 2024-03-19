@@ -16,7 +16,7 @@ import {
   extractAverageBuyinStackData,
   extractWinsLossesData,
   stringToColorHash,
-} from "./chart-utils";
+} from "../chart-utils";
 
 interface ChartProps {
   games: ExtendedGame[];

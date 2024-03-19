@@ -13,18 +13,20 @@ import {
 import { ExtendedGame } from "@/app/edit/games";
 import { Player } from "@prisma/client";
 import { Payload } from "recharts/types/component/DefaultLegendContent";
-import { extractTotals, stringToColorHash } from "./chart-utils";
+import { extractTotals, stringToColorHash } from "../chart-utils";
 
 interface ChartProps {
   games: ExtendedGame[];
   players: Player[];
   renderPlayer: (payload: Payload) => JSX.Element;
+  includeLatest: boolean;
 }
 
 export default function TotalChart({
   games,
   players,
   renderPlayer,
+  includeLatest,
 }: ChartProps) {
   const data = extractTotals(games, players);
 
@@ -52,7 +54,13 @@ export default function TotalChart({
             </div>
           )}
         />
-        <Brush dataKey="name" height={30} stroke="#8884d8" />
+        <Brush
+          startIndex={data.length - (includeLatest ? 6 : 7)}
+          endIndex={data.length - (includeLatest ? 1 : 2)}
+          dataKey="name"
+          height={30}
+          stroke="#8884d8"
+        />
         <Legend
           align="right"
           verticalAlign="middle"

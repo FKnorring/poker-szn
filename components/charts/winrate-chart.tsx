@@ -12,32 +12,24 @@ import {
 } from "recharts";
 import { ExtendedGame } from "@/app/edit/games";
 import { Player } from "@prisma/client";
-import { extractAverageBuyinStackData, stringToColorHash } from "./chart-utils";
+import { extractWinrate, stringToColorHash } from "../chart-utils";
 
 interface ChartProps {
   games: ExtendedGame[];
   players: Player[];
 }
 
-export default function BuyinStackChart({ games, players }: ChartProps) {
-  const data = extractAverageBuyinStackData(games, players);
+export default function WinRateChart({ games, players }: ChartProps) {
+  const data = extractWinrate(games, players);
 
   return (
-    <ResponsiveContainer width="100%">
-      <BarChart
-        width={500}
-        height={300}
-        data={data}
-        margin={{
-          top: 5,
-          right: 30,
-          left: 20,
-          bottom: 5,
-        }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
+    <ResponsiveContainer width="100%" className="flex-grow">
+      <BarChart width={600} height={300} data={data}>
         <XAxis dataKey="name" />
-        <YAxis />
+        <YAxis
+          label={{ value: "Vinst (%)", angle: -90, position: "insideLeft" }}
+        />
+        <CartesianGrid strokeDasharray="3 3" />
         <Tooltip
           content={({ payload, label }) => (
             <div className="bg-white p-4 shadow-md rounded-md border">
@@ -45,16 +37,14 @@ export default function BuyinStackChart({ games, players }: ChartProps) {
               <ul className="text-xs flex flex-col gap-1">
                 {payload?.map((entry) => (
                   <li key={entry.dataKey}>
-                    {entry.name}: {entry.value?.toLocaleString()} kr
+                    Vinst: {entry.value?.toLocaleString()}%
                   </li>
                 ))}
               </ul>
             </div>
           )}
         />
-        <Legend />
-        <Bar dataKey="avgBuyin" fill="#8884d8" name="Average Buy-in" />
-        <Bar dataKey="avgStack" fill="#82ca9d" name="Average Stack" />
+        <Bar dataKey="WinRate" fill="#8884d8" />
       </BarChart>
     </ResponsiveContainer>
   );

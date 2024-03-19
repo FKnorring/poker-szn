@@ -13,11 +13,11 @@ import {
 import { useTheme } from "next-themes";
 import { Badge } from "./ui/badge";
 import { stringToColorHash, getTop12Players } from "./chart-utils";
-import TotalChart from "./total-chart";
+import TotalChart from "./charts/total-chart";
 import { SelectProps } from "@radix-ui/react-select";
-import WinRateChart from "./winrate-chart";
-import BuyinStackChart from "./buyin-stack-chart";
-import WinLossChart from "./win-loss-chart";
+import WinRateChart from "./charts/winrate-chart";
+import BuyinStackChart from "./charts/buyin-stack-chart";
+import WinLossChart from "./charts/win-loss-chart";
 import { Play, Pause } from "lucide-react";
 import { Button } from "./ui/button";
 interface ChartHandlerProps {
@@ -93,14 +93,17 @@ const charts = {
   buyinStack: BuyinStackChart,
 };
 
+const chartKeys = Object.keys(charts) as (keyof typeof charts)[];
+
 export default function ChartHandler({ games, players }: ChartHandlerProps) {
+  const latestGame = games.sort(
+    (a, b) => b.date.getTime() - a.date.getTime()
+  )[0];
   const [showPlayers, setshowPlayers] = useState(
-    new Set<string>(players.map(({ name }) => name))
+    new Set<string>(latestGame.players.map(({ name }) => name))
   );
 
-  const [chart, setChart] = useState<
-    "total" | "winrate" | "winloss" | "buyinStack"
-  >("total");
+  const [chart, setChart] = useState<keyof typeof charts>("total");
 
   const [slideshow, setSlideshow] = useState(false);
 
@@ -108,11 +111,8 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
     if (!slideshow) return;
     const interval = setInterval(() => {
       setChart((prev) => {
-        if (prev === "total") return "winrate";
-        if (prev === "winrate") return "winloss";
-        if (prev === "winloss") return "buyinStack";
-        if (prev === "buyinStack") return "total";
-        return "total";
+        const nextIndex = (chartKeys.indexOf(prev) + 1) % chartKeys.length;
+        return chartKeys[nextIndex];
       });
     }, 15000);
     return () => clearInterval(interval);
@@ -158,6 +158,8 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
     ({ name }) => !showPlayers.has(name)
   );
 
+  const includeLatest = latestGame.date.getTime() < new Date().getTime();
+
   return (
     <>
       <div className="flex gap-2 flex-wrap">
@@ -192,6 +194,7 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
             onClick={() => filterPlayer(entry.value)}
           />
         ),
+        includeLatest,
       })}
     </>
   );
