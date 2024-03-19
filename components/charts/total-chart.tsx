@@ -32,11 +32,7 @@ export default function TotalChart({
 
   return (
     <ResponsiveContainer width="100%" className="flex-grow">
-      <LineChart
-        data={data}
-        margin={{ top: 30, right: 10, left: 0, bottom: 30 }}
-        className="bg-white rounded-md"
-      >
+      <LineChart data={data} className="bg-white rounded-md">
         <XAxis dataKey="name" padding="gap" />
         <YAxis />
         <CartesianGrid strokeDasharray="3 3" />
