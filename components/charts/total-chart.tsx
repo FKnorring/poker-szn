@@ -57,6 +57,7 @@ export default function TotalChart({
         <Brush
           startIndex={data.length - (includeLatest ? 6 : 7)}
           endIndex={data.length - (includeLatest ? 1 : 2)}
+          travellerWidth={20}
           dataKey="name"
           height={30}
           stroke="#8884d8"

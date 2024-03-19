@@ -42,18 +42,26 @@ export default function BuyinStackChart({ games, players }: ChartProps) {
         <XAxis dataKey="name" />
         <YAxis />
         <Tooltip
-          content={({ payload, label }) => (
-            <div className="bg-white p-4 shadow-md rounded-md border">
-              <p className="text-sm font-bold">{label}</p>
-              <ul className="text-xs flex flex-col gap-1">
-                {payload?.map((entry) => (
-                  <li key={entry.dataKey}>
-                    {entry.name}: {entry.value?.toLocaleString()} kr
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          content={({ payload, label }) => {
+            const avgBuyin = payload?.find((p) => p.dataKey === "avgBuyin")
+              ?.value as number;
+            const avgStack = payload?.find((p) => p.dataKey === "avgStack")
+              ?.value as number;
+            const avgGain = (avgStack || 0) - (avgBuyin || 0);
+            return (
+              <div className="bg-white p-4 shadow-md rounded-md border">
+                <p className="text-sm font-bold">{label}</p>
+                <ul className="text-xs flex flex-col gap-1">
+                  {payload?.map((entry) => (
+                    <li key={entry.dataKey}>
+                      {entry.name}: {entry.value?.toLocaleString()} kr
+                    </li>
+                  ))}
+                  <li>Average Gain: {avgGain?.toLocaleString()} kr</li>
+                </ul>
+              </div>
+            );
+          }}
         />
         <Legend />
         <Bar dataKey="avgBuyin" fill="#8884d8" name="Average Buy-in" />

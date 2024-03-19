@@ -52,6 +52,7 @@ export default function WinLossChart({ games, players }: ChartProps) {
                     {entry.name}: {entry.value?.toLocaleString()}
                   </li>
                 ))}
+                <li></li>
               </ul>
             </div>
           )}
