@@ -12,14 +12,21 @@ import {
 } from "@/components/ui/select";
 import { useTheme } from "next-themes";
 import { Badge } from "./ui/badge";
-import { stringToColorHash, getTop12Players } from "./chart-utils";
+import {
+  stringToColorHash,
+  getTop12Players,
+  getTop10PlayersByAttendance,
+} from "./chart-utils";
 import TotalChart from "./charts/total-chart";
 import { SelectProps } from "@radix-ui/react-select";
 import WinRateChart from "./charts/winrate-chart";
 import BuyinStackChart from "./charts/buyin-stack-chart";
 import WinLossChart from "./charts/win-loss-chart";
+import LargestStackChart from "./charts/largest-stack-chart";
+import BuyinChart from "./charts/buyin-chart";
 import { Play, Pause } from "lucide-react";
 import { Button } from "./ui/button";
+import BiggestGainChart from "./charts/biggest-gain";
 interface ChartHandlerProps {
   games: ExtendedGame[];
   players: Player[];
@@ -56,7 +63,10 @@ function GameSelect({ games, ...props }: GameSelectProps) {
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="all">Alla matcher</SelectItem>
+        <hr className="my-1" />
         <SelectItem value="top12">Top 12</SelectItem>
+        <SelectItem value="topAttendance">Top 12 Närvaro</SelectItem>
+        <hr className="my-1" />
         {games
           .sort((a, b) => b.date.getTime() - a.date.getTime())
           .map((game) => (
@@ -64,6 +74,7 @@ function GameSelect({ games, ...props }: GameSelectProps) {
               {game.date.toLocaleDateString()}
             </SelectItem>
           ))}
+        <hr className="my-1" />
         <SelectItem value="none">Rensa spelare</SelectItem>
       </SelectContent>
     </Select>
@@ -81,6 +92,9 @@ function ChartSelect({ ...props }: SelectProps) {
         <SelectItem value="winrate">Vinsthalt</SelectItem>
         <SelectItem value="winloss">Vinst/Förlust</SelectItem>
         <SelectItem value="buyinStack">Avg Buyin / Stack</SelectItem>
+        <SelectItem value="largestStack">Största stack</SelectItem>
+        <SelectItem value="buyin">Total buyin</SelectItem>
+        <SelectItem value="maxGain">Största vinst</SelectItem>
       </SelectContent>
     </Select>
   );
@@ -91,6 +105,9 @@ const charts = {
   winrate: WinRateChart,
   winloss: WinLossChart,
   buyinStack: BuyinStackChart,
+  largestStack: LargestStackChart,
+  buyin: BuyinChart,
+  maxGain: BiggestGainChart,
 };
 
 const chartKeys = Object.keys(charts) as (keyof typeof charts)[];
@@ -136,6 +153,11 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
     if (gameId === "top12") {
       const top12 = getTop12Players(games, players);
       setshowPlayers(new Set(top12));
+      return;
+    }
+    if (gameId === "topAttendance") {
+      const topAttendance = getTop10PlayersByAttendance(games, players);
+      setshowPlayers(new Set(topAttendance));
       return;
     }
     if (gameId === "none") {

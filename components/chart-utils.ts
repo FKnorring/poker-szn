@@ -164,6 +164,36 @@ export function getTop12Players(games: ExtendedGame[], players: Player[]) {
     .map(([name]) => name);
 }
 
+export function getTop10PlayersByAttendance(
+  games: ExtendedGame[],
+  players: Player[]
+) {
+  const playerNames: PlayerNames = players.reduce((acc, player) => {
+    acc[player.id] = player.name;
+    return acc;
+  }, {} as PlayerNames);
+
+  const attendance = Object.values(playerNames).reduce((acc, name) => {
+    acc[name] = 0;
+    return acc;
+  }, {} as PlayerData);
+
+  games.forEach((game) => {
+    game.scores.forEach(({ playerId }) => {
+      const playerName = playerNames[playerId];
+      if (playerName) {
+        attendance[playerName] += 1;
+      }
+    });
+  });
+
+  return Object.entries(attendance)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 12)
+    .map(([name, _]) => name)
+    .filter((name) => name);
+}
+
 export function extractAverageBuyinStackData(
   games: ExtendedGame[],
   players: Player[]
@@ -245,4 +275,87 @@ export function extractWinsLossesData(
   }));
 
   return data;
+}
+
+export function calculateTotalBuyin(games: ExtendedGame[], players: Player[]) {
+  const playerNames: PlayerNames = players.reduce((acc, player) => {
+    acc[player.id] = player.name;
+    return acc;
+  }, {} as PlayerNames);
+
+  const totalBuyins = Object.values(playerNames).reduce((acc, name) => {
+    acc[name] = 0;
+    return acc;
+  }, {} as PlayerData);
+
+  games.forEach((game) => {
+    game.scores.forEach(({ playerId, buyins }) => {
+      const playerName = playerNames[playerId];
+      totalBuyins[playerName] += buyins * 100; // Assuming buyins are counted in units of 100
+    });
+  });
+
+  return Object.entries(totalBuyins).map(([name, buyin]) => ({
+    name,
+    buyin,
+  }));
+}
+
+export function calculateMaxStack(games: ExtendedGame[], players: Player[]) {
+  const playerNames: PlayerNames = players.reduce((acc, player) => {
+    acc[player.id] = player.name;
+    return acc;
+  }, {} as PlayerNames);
+
+  const maxStacks = Object.values(playerNames).reduce((acc, name) => {
+    acc[name] = { stack: 0, buyin: 0 };
+    return acc;
+  }, {} as { [name: string]: { stack: number; buyin: number } });
+
+  games.forEach((game) => {
+    game.scores.forEach(({ playerId, stack, buyins }) => {
+      const playerName = playerNames[playerId];
+      if (!playerName) return;
+      if (stack > maxStacks[playerName].stack) {
+        maxStacks[playerName].stack = stack;
+        maxStacks[playerName].buyin = buyins * 100; // Assuming buyins are counted in units of 100
+      }
+    });
+  });
+
+  return Object.entries(maxStacks).map(([name, { stack, buyin }]) => ({
+    name,
+    stack,
+    buyin,
+  }));
+}
+
+export function calculateMaxGain(games: ExtendedGame[], players: Player[]) {
+  const playerNames: PlayerNames = players.reduce((acc, player) => {
+    acc[player.id] = player.name;
+    return acc;
+  }, {} as PlayerNames);
+
+  const maxGains = Object.values(playerNames).reduce((acc, name) => {
+    acc[name] = { stack: 0, buyin: 0, gain: 0 };
+    return acc;
+  }, {} as { [name: string]: { stack: number; buyin: number; gain: number } });
+
+  games.forEach((game) => {
+    game.scores.forEach(({ playerId, stack, buyins }) => {
+      const playerName = playerNames[playerId];
+      if (!playerName) return;
+      const gain = stack - buyins * 100; // Calculate the gain
+      if (gain > maxGains[playerName].gain) {
+        maxGains[playerName] = { stack, buyin: -buyins * 100, gain };
+      }
+    });
+  });
+
+  return Object.entries(maxGains).map(([name, { stack, buyin, gain }]) => ({
+    name,
+    stack,
+    buyin,
+    gain,
+  }));
 }
