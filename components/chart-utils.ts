@@ -359,3 +359,76 @@ export function calculateMaxGain(games: ExtendedGame[], players: Player[]) {
     gain,
   }));
 }
+
+export function extractHourlyRate(games: ExtendedGame[], players: Player[]) {
+  const playerNames: PlayerNames = players.reduce((acc, player) => {
+    acc[player.id] = player.name;
+    return acc;
+  }, {} as PlayerNames);
+
+  const totalGains = Object.values(playerNames).reduce((acc, name) => {
+    acc[name] = 0;
+    return acc;
+  }, {} as PlayerData);
+
+  const totalGamesPlayed = Object.values(playerNames).reduce((acc, name) => {
+    acc[name] = 0;
+    return acc;
+  }, {} as PlayerData);
+
+  games.forEach((game) => {
+    game.scores.forEach(({ playerId, stack, buyins }) => {
+      const playerName = playerNames[playerId];
+      totalGains[playerName] += stack - buyins * 100;
+      totalGamesPlayed[playerName] += 1;
+    });
+  });
+
+  const hourlyRateData = Object.entries(playerNames).map(([id, name]) => {
+    const totalHoursPlayed = totalGamesPlayed[name] * 5; // 5 hours per game
+    const hourlyRate =
+      totalHoursPlayed > 0 ? totalGains[name] / totalHoursPlayed : 0;
+    return {
+      name,
+      hourlyRate,
+    };
+  });
+
+  return hourlyRateData.filter(({ hourlyRate }) => !isNaN(hourlyRate)); // Filter out players with no games
+}
+
+export function extractROI(games: ExtendedGame[], players: Player[]) {
+  const playerNames: PlayerNames = players.reduce((acc, player) => {
+    acc[player.id] = player.name;
+    return acc;
+  }, {} as PlayerNames);
+
+  const totalGains = Object.values(playerNames).reduce((acc, name) => {
+    acc[name] = 0;
+    return acc;
+  }, {} as PlayerData);
+
+  const totalBuyins = Object.values(playerNames).reduce((acc, name) => {
+    acc[name] = 0;
+    return acc;
+  }, {} as PlayerData);
+
+  games.forEach((game) => {
+    game.scores.forEach(({ playerId, stack, buyins }) => {
+      const playerName = playerNames[playerId];
+      totalGains[playerName] += stack - buyins * 100;
+      totalBuyins[playerName] += buyins * 100; // Assuming buyins are counted in units of 100
+    });
+  });
+
+  const ROIData = Object.entries(playerNames).map(([id, name]) => {
+    const ROI =
+      totalBuyins[name] > 0 ? (totalGains[name] / totalBuyins[name]) * 100 : 0;
+    return {
+      name,
+      ROI,
+    };
+  });
+
+  return ROIData.filter(({ ROI }) => !isNaN(ROI)); // Filter out players with no games
+}

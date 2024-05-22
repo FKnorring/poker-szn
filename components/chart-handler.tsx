@@ -27,6 +27,8 @@ import BuyinChart from "./charts/buyin-chart";
 import { Play, Pause } from "lucide-react";
 import { Button } from "./ui/button";
 import BiggestGainChart from "./charts/biggest-gain";
+import ROIChart from "./charts/roi-chart";
+import RateChart from "./charts/hourly-rate-chart";
 interface ChartHandlerProps {
   games: ExtendedGame[];
   players: Player[];
@@ -95,6 +97,8 @@ function ChartSelect({ ...props }: SelectProps) {
         <SelectItem value="largestStack">Största stack</SelectItem>
         <SelectItem value="buyin">Total buyin</SelectItem>
         <SelectItem value="maxGain">Största vinst</SelectItem>
+        <SelectItem value="roi">ROI</SelectItem>
+        <SelectItem value="hourly">Timlön</SelectItem>
       </SelectContent>
     </Select>
   );
@@ -108,6 +112,8 @@ const charts = {
   largestStack: LargestStackChart,
   buyin: BuyinChart,
   maxGain: BiggestGainChart,
+  roi: ROIChart,
+  hourly: RateChart,
 };
 
 const chartKeys = Object.keys(charts) as (keyof typeof charts)[];
