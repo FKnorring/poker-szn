@@ -123,7 +123,7 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
     (a, b) => b.date.getTime() - a.date.getTime()
   )[0];
   const [showPlayers, setshowPlayers] = useState(
-    new Set<string>(latestGame.players.map(({ name }) => name))
+    new Set<string>(latestGame?.players.map(({ name }) => name))
   );
 
   const [chart, setChart] = useState<keyof typeof charts>("total");
@@ -186,7 +186,7 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
     ({ name }) => !showPlayers.has(name)
   );
 
-  const includeLatest = latestGame.date.getTime() < new Date().getTime();
+  const includeLatest = latestGame?.date.getTime() < new Date().getTime();
 
   return (
     <>

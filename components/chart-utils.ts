@@ -113,7 +113,8 @@ export function getTopPlayers(games: ExtendedGame[], players: Player[]) {
   const data = extractTotals(games, players);
   const latest = data[data.length - 1];
   // @ts-ignore
-  delete latest.name;
+  if (latest && latest.name) delete latest.name;
+  else return [];
   // @ts-ignore
   return Object.entries(latest).sort((a, b) => b[1] - a[1]);
 }

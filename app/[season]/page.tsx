@@ -1,15 +1,22 @@
-import { Button } from "@/components/ui/button";
-import { getGames, getPlayers } from "./utils";
-import Link from "next/link";
+// pages/index/[season].tsx
+import { useParams } from "next/navigation";
+import { getGames, getPlayers } from "@/app/utils";
 import ChartHandler from "@/components/chart-handler";
-import { Separator } from "@/components/ui/separator";
 import Leaderboard from "@/components/leaderboard";
+import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { Calendar, Spade, Heart, Diamond, Club, Coins } from "lucide-react";
 import { GeistMono } from "geist/font/mono";
 import { ModeToggle } from "@/components/toggle-theme";
 
-export default async function Home() {
-  const games = await getGames();
+export default async function Home({ params }: { params: { season: string } }) {
+  const { season } = params;
+
+  // Ensure season is a number
+  const seasonNumber = parseInt(season as string, 10);
+
+  const games = await getGames(seasonNumber);
   const players = await getPlayers();
 
   return (

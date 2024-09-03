@@ -1,6 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
+const CURRENT_SEASON = 1;
+
 export function revalidateAll() {
   revalidatePath("/", "layout");
 }
@@ -10,9 +12,10 @@ export function getPlayers() {
   return prisma.player.findMany();
 }
 
-export function getGames() {
+export function getGames(season: number = CURRENT_SEASON) {
   const prisma = new PrismaClient();
   return prisma.game.findMany({
+    where: { season },
     include: { players: true, scores: true },
   });
 }
@@ -45,6 +48,7 @@ export async function addGame(date: Date) {
   const res = await prisma.game.create({
     data: {
       date,
+      season: CURRENT_SEASON,
     },
   });
   revalidateAll();

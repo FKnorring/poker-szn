@@ -17,7 +17,7 @@ export default async function EditGames() {
     return (
       <div className="flex items-center justify-center h-full gap-4 flex-col">
         <h1 className="text-4xl font-extrabold tracking-widest">
-          POKER SZN VT_24
+          POKER SZN HT_24
         </h1>
         <LoginLink className="text-lg text-center">
           Logga in för att se statistik och lägga till matcher.
@@ -31,7 +31,7 @@ export default async function EditGames() {
     return (
       <div className="flex items-center justify-center h-full gap-4 flex-col">
         <h1 className="text-4xl font-extrabold tracking-widest">
-          POKER SZN VT_24
+          POKER SZN HT_24
         </h1>
         <p className="text-lg text-center">
           Du har inte tillräckliga rättigheter för att redigera matcher.
@@ -55,7 +55,7 @@ export default async function EditGames() {
         <h1
           className={`text-4xl font-extrabold tracking-widest ${GeistMono.className}`}
         >
-          POKER SZN VT_24
+          POKER SZN HT_24
         </h1>
         <Heart size={32} />
         <Spade size={32} />

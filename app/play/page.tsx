@@ -14,7 +14,7 @@ export default async function Play() {
     return (
       <div className="flex items-center justify-center h-full gap-4 flex-col">
         <h1 className="text-4xl font-extrabold tracking-widest">
-          POKER SZN VT_24
+          POKER SZN HT_24
         </h1>
         <p className="text-lg text-center">Inga matcher har spelats än.</p>
       </div>
@@ -36,7 +36,7 @@ export default async function Play() {
         <h1
           className={`p-2 text-3xl font-extrabold tracking-tighter ${GeistMono.className}`}
         >
-          POKER SZN VT_24
+          POKER SZN HT_24
         </h1>
       </div>
       <Separator />
