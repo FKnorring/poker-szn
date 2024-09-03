@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Player, Score } from "@prisma/client";
 import { ExtendedPlayer } from "../utils";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useTable } from "../context";
 import {
@@ -23,6 +23,11 @@ interface EditableCellProps {
 
 function EditableCell({ id, type, amount }: EditableCellProps) {
   const { updatePlayer, players } = useTable();
+  const [inputValue, setInputValue] = useState<string>(amount.toString());
+
+  useEffect(() => {
+    setInputValue(amount.toString());
+  }, [amount]);
 
   function increment(value: number) {
     const currentBuyins = players.find((p) => p.id === id)?.buyins;
@@ -62,14 +67,21 @@ function EditableCell({ id, type, amount }: EditableCellProps) {
         className={`${minW} px-[6px] lg:px-3`}
         name={`${type}-${id}`}
         type="number"
-        value={amount}
+        value={inputValue}
         onChange={(e) => {
-          const value = e.target.value;
-          updatePlayer(
-            id,
-            type === "buyins" ? +value : undefined,
-            type === "stack" ? +value : undefined
-          );
+          // Replace comma with dot
+          const value = e.target.value.replace(",", ".");
+          setInputValue(value);
+        }}
+        onBlur={() => {
+          const value = parseFloat(inputValue.replace(",", "."));
+          if (!isNaN(value)) {
+            updatePlayer(
+              id,
+              type === "buyins" ? value : undefined,
+              type === "stack" ? value : undefined
+            );
+          }
         }}
       />
       {type === "buyins" && incrementers}
