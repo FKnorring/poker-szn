@@ -111,12 +111,26 @@ export function extractWinrate(games: ExtendedGame[], players: Player[]) {
 
 export function getTopPlayers(games: ExtendedGame[], players: Player[]) {
   const data = extractTotals(games, players);
+  const gamesPerPlayer = games.reduce((acc, game) => {
+    game.players.forEach((player) => {
+      if (acc[player.name]) {
+        acc[player.name]++;
+      } else {
+        acc[player.name] = 1;
+      }
+    });
+    return acc;
+  }, {} as { [name: string]: number });
   const latest = data[data.length - 1];
   // @ts-ignore
   if (latest && latest.name) delete latest.name;
   else return [];
   // @ts-ignore
-  return Object.entries(latest).sort((a, b) => b[1] - a[1]);
+  return Object.entries(latest)
+    .sort((a, b) => b[1] - a[1])
+    .map(([name, score]) => {
+      return [name, score, gamesPerPlayer[name]];
+    });
 }
 
 export function getPlayersWithMoreThanKGames(

@@ -44,26 +44,28 @@ export default function Leaderboard({ games, players }: LeaderboardProps) {
       </div>
       <Separator />
       <ScrollArea className="flex flex-col rounded-md border lg:max-h-[75vh]">
-        {(moreThan3 ? tournamentPlayers : topPlayers).map(
-          ([name, score, games], i) =>
-            name && (
-              <li
-                key={name}
-                className={`flex gap-2 items-center shadow p-2 text-sm font-semibold ${
-                  i < 3
-                    ? colors[i] + " bg-opacity-50"
-                    : i > 11
-                    ? danger + " bg-opacity-25"
-                    : ""
-                }`}
-              >
-                <span className="flex-grow">
-                  {i + 1}. {name} {games && `(${games})`}
-                </span>
-                <span>{score} kr</span>
-              </li>
-            )
-        )}
+        {(moreThan3 ? tournamentPlayers : topPlayers)
+          .filter(([_, __, games]) => Boolean(games))
+          .map(
+            ([name, score, games], i) =>
+              name && (
+                <li
+                  key={name}
+                  className={`flex gap-2 items-center shadow p-2 text-sm font-semibold ${
+                    i < 3
+                      ? colors[i] + " bg-opacity-50"
+                      : i > 11
+                      ? danger + " bg-opacity-25"
+                      : ""
+                  }`}
+                >
+                  <span className="flex-grow">
+                    {i + 1}. {name} {games && `(${games})`}
+                  </span>
+                  <span>{score} kr</span>
+                </li>
+              )
+          )}
       </ScrollArea>
     </div>
   );
