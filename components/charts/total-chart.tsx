@@ -10,6 +10,13 @@ import {
   ResponsiveContainer,
   Brush,
 } from "recharts";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+} from "@/components/ui/chart";
 import { ExtendedGame } from "@/app/edit/games";
 import { Player } from "@prisma/client";
 import { Payload } from "recharts/types/component/DefaultLegendContent";
@@ -31,25 +38,24 @@ export default function TotalChart({
   const data = extractTotals(games, players);
 
   return (
-    <ResponsiveContainer width="100%" className="flex-grow">
-      <LineChart data={data} className="bg-white rounded-md">
+    <ChartContainer
+      config={{
+        desktop: {
+          label: "Desktop",
+          color: "#2563eb",
+        },
+        mobile: {
+          label: "Mobile",
+          color: "#60a5fa",
+        },
+      }}
+      className="flex-grow max-h-[75vh]"
+    >
+      <LineChart accessibilityLayer data={data} className="bg-white rounded-md">
         <XAxis dataKey="name" padding="gap" />
         <YAxis />
         <CartesianGrid strokeDasharray="3 3" />
-        <Tooltip
-          content={({ active, payload, label }) => (
-            <div className="bg-white p-4 shadow-md rounded-md border">
-              <p className="text-sm font-bold">{label}</p>
-              <ul className="text-xs flex flex-col gap-1">
-                {payload?.map((entry) => (
-                  <li key={entry.dataKey}>
-                    {entry.dataKey}: {entry.value}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        />
+        <ChartTooltip content={<ChartTooltipContent />} />
         <Brush
           startIndex={data.length - (includeLatest ? 6 : 7)}
           endIndex={data.length - (includeLatest ? 1 : 2)}
@@ -85,6 +91,6 @@ export default function TotalChart({
             />
           ))}
       </LineChart>
-    </ResponsiveContainer>
+    </ChartContainer>
   );
 }

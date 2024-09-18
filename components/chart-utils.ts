@@ -125,8 +125,8 @@ export function getTopPlayers(games: ExtendedGame[], players: Player[]) {
   // @ts-ignore
   if (latest && latest.name) delete latest.name;
   else return [];
-  // @ts-ignore
-  return Object.entries(latest)
+
+  return Object.entries(latest) // @ts-ignore
     .sort((a, b) => b[1] - a[1])
     .map(([name, score]) => {
       return [name, score, gamesPerPlayer[name]];
