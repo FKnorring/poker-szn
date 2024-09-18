@@ -169,7 +169,7 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
     }
     if (gameId === "top12") {
       const top12 = getTop12Players(games, players);
-      setshowPlayers(new Set(top12));
+      setshowPlayers(new Set(top12.map((name) => name.toString())));
       return;
     }
     if (gameId === "topAttendance") {
