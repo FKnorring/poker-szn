@@ -16,6 +16,7 @@ import {
   stringToColorHash,
   getTop12Players,
   getTop10PlayersByAttendance,
+  getContrastColor,
 } from "./chart-utils";
 import TotalChart from "./charts/total-chart";
 import { SelectProps } from "@radix-ui/react-select";
@@ -35,14 +36,24 @@ interface ChartHandlerProps {
 }
 
 function DrawPlayer({ name, onClick }: { name: string; onClick: () => void }) {
+  const bgColor = stringToColorHash(name);
+  const textColor = getContrastColor(bgColor); // 'black' or 'white'
+
   return (
     <li onClick={onClick} role="button" className="ms-2">
-      <Badge
-        variant="outline"
-        style={{ backgroundColor: stringToColorHash(name) }}
-      >
-        <span className="text-xs font-bold hidden lg:block">{name}</span>
-        <span className="text-xs font-bold block lg:hidden">
+      <Badge variant="outline" style={{ backgroundColor: bgColor }}>
+        <span
+          className={`text-xs font-bold hidden lg:block ${
+            textColor === "white" ? "text-white" : "text-black"
+          }`}
+        >
+          {name}
+        </span>
+        <span
+          className={`text-xs font-bold block lg:hidden ${
+            textColor === "white" ? "text-white" : "text-black"
+          }`}
+        >
           {name
             .split(" ")
             .map((c) => c[0])

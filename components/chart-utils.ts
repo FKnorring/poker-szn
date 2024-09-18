@@ -31,6 +31,22 @@ export function stringToColorHash(name: string): string {
   return color;
 }
 
+export function getContrastColor(bgColor: string) {
+  // Remove the hash if it's there
+  bgColor = bgColor.replace("#", "");
+
+  // Parse the R, G, B values
+  const r = parseInt(bgColor.substr(0, 2), 16);
+  const g = parseInt(bgColor.substr(2, 2), 16);
+  const b = parseInt(bgColor.substr(4, 2), 16);
+
+  // Calculate the brightness
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+
+  // Return 'black' or 'white' based on brightness
+  return brightness > 128 ? "black" : "white";
+}
+
 export function extractTotals(games: ExtendedGame[], players: Player[]) {
   const playerNames: PlayerNames = players.reduce((acc, { name, id }) => {
     return { [id]: name, ...acc };
