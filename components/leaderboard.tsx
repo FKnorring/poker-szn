@@ -14,6 +14,23 @@ interface LeaderboardProps {
   players: Player[];
 }
 
+function shortenName(name: string) {
+  const parts = name.trim().split(" ");
+  const firstName = parts[0];
+  const lastNameParts = parts.slice(1);
+
+  // If name is longer than 20 characters, shorten the last names
+  if (name.length > 20) {
+    const lastNameInitials = lastNameParts
+      .map((part) => (part ? part.charAt(0) + "." : ""))
+      .join(" ");
+    return [firstName, lastNameInitials].join(" ").trim();
+  } else {
+    // Return the full name as is
+    return name;
+  }
+}
+
 export default function Leaderboard({ games, players }: LeaderboardProps) {
   const [moreThan3, setMoreThan3] = useState(false);
   const topPlayers = getTopPlayers(games, players);
@@ -60,7 +77,8 @@ export default function Leaderboard({ games, players }: LeaderboardProps) {
                   }`}
                 >
                   <span className="flex-grow">
-                    {i + 1}. {name} {games && `(${games})`}
+                    {i + 1}. {shortenName(name as string)}{" "}
+                    {games && `(${games})`}
                   </span>
                   <span>{score} kr</span>
                 </li>
