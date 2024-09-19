@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { getGames, getPlayers } from "./utils";
+import { getGames, getPlayers, getTotalBuyin } from "./utils";
 import Link from "next/link";
 import ChartHandler from "@/components/chart-handler";
 import { Separator } from "@/components/ui/separator";
@@ -11,6 +11,7 @@ import { ModeToggle } from "@/components/toggle-theme";
 export default async function Home() {
   const games = await getGames();
   const players = await getPlayers();
+  const totalBuyin = await getTotalBuyin();
 
   return (
     <>
@@ -26,6 +27,9 @@ export default async function Home() {
           <Diamond size={32} />
           <Club size={32} />
         </div>
+        <span className="text-xs text-gray-300">
+          total buyin {totalBuyin * 100}kr
+        </span>
         <div className="ms-auto">
           <ModeToggle />
         </div>

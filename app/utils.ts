@@ -190,3 +190,14 @@ export function fetchLatestGame() {
     },
   });
 }
+
+export function getTotalBuyin() {
+  const prisma = new PrismaClient();
+  return prisma.score
+    .aggregate({
+      _sum: {
+        buyins: true,
+      },
+    })
+    .then((res) => res._sum.buyins || 0);
+}
