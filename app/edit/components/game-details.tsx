@@ -162,6 +162,9 @@ export default function GameDetails({ game }: { game: ExtendedGame }) {
               >
                 Ta bort match <X size={16} />
               </Button>
+              <Badge className="ms-auto" variant="default">
+                Snittstack: {Math.floor(moneyIn / (gamePlayers.length || 0))} kr
+              </Badge>
             </div>
           </form>
         </TableProvider>
