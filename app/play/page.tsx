@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { getGameMoney, getPlayerScores } from "../edit/utils";
 import Link from "next/link";
+import Header from "@/components/header";
 
 export default async function Play() {
   const latestGame = await fetchLatestGame();
@@ -13,7 +14,7 @@ export default async function Play() {
   if (!latestGame) {
     return (
       <div className="flex items-center justify-center h-full gap-4 flex-col">
-        <h1 className="text-4xl font-extrabold tracking-widest">
+        <h1 className={`text-4xl font-extrabold tracking-widest ${GeistMono.className}`}>
           POKER SZN HT_24
         </h1>
         <p className="text-lg text-center">Inga matcher har spelats än.</p>
@@ -32,14 +33,7 @@ export default async function Play() {
 
   return (
     <>
-      <div className="flex items-center gap-2">
-        <h1
-          className={`p-2 text-3xl font-extrabold tracking-tighter ${GeistMono.className}`}
-        >
-          POKER SZN HT_24
-        </h1>
-      </div>
-      <Separator />
+      <Header showStats showPlay={false} />
       <div className="flex-grow flex-col flex items-center h-full">
         {playTime ? (
           <p>{latestGame.date.toLocaleDateString()}</p>

@@ -1,10 +1,10 @@
 import { Player } from "@prisma/client";
 import { createContext, useContext } from "react";
-import { ExtendedPlayer } from "./utils";
+import { ExtendedPlayer, PlayerWithCount } from "./utils";
 
 interface EditGameContextProps {
-  players: Player[];
-  setPlayers: React.Dispatch<React.SetStateAction<Player[]>>;
+  players: PlayerWithCount[];
+  setPlayers: React.Dispatch<React.SetStateAction<PlayerWithCount[]>>;
 }
 
 export const EditGameContext = createContext<EditGameContextProps>(

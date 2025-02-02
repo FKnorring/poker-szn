@@ -19,15 +19,21 @@ import {
 } from "@/components/ui/popover";
 import { Player } from "@prisma/client";
 
+interface PlayerWithCount extends Player {
+  _count: {
+    Games: number;
+  };
+}
+
 interface AutoCompleteProps {
-  players: Player[];
+  players: PlayerWithCount[];
 }
 
 export default function AutoComplete({ players }: AutoCompleteProps) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
   const [query, setQuery] = useState("");
-  const [_players, setPlayers] = useState<Player[]>(players);
+  const [_players, setPlayers] = useState<PlayerWithCount[]>(players);
 
   useEffect(() => {
     setPlayers(players);
@@ -35,7 +41,11 @@ export default function AutoComplete({ players }: AutoCompleteProps) {
 
   function addPlayer() {
     setPlayers((players) => {
-      const player = { id: players.length + 1, name: query };
+      const player = { 
+        id: players.length + 1, 
+        name: query,
+        _count: { Games: 0 }
+      };
       return [...players, player];
     });
     setValue(query);
@@ -78,7 +88,7 @@ export default function AutoComplete({ players }: AutoCompleteProps) {
                 Lägg till ny spelare <Plus size={16} />
               </Button>
             </CommandEmpty>
-            <CommandGroup>
+            <CommandGroup className="max-h-[200px] overflow-y-auto">
               {_players.map((player) => (
                 <CommandItem
                   key={player.id}
@@ -86,8 +96,12 @@ export default function AutoComplete({ players }: AutoCompleteProps) {
                     setValue(player.name === value ? "" : player.name);
                     setOpen(false);
                   }}
+                  className="flex justify-between"
                 >
-                  {player.name}
+                  <span>{player.name}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {player._count.Games}
+                  </span>
                 </CommandItem>
               ))}
             </CommandGroup>

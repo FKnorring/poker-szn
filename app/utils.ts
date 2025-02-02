@@ -1,7 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { CURRENT } from "@/config/season";
 
-const CURRENT_SEASON = 1;
+const CURRENT_SEASON = CURRENT.id;
 
 export function revalidateAll() {
   revalidatePath("/", "layout");
@@ -9,14 +10,28 @@ export function revalidateAll() {
 
 export function getPlayers() {
   const prisma = new PrismaClient();
-  return prisma.player.findMany();
+  return prisma.player.findMany({
+    include: {
+      _count: {
+        select: {
+          Games: true
+        }
+      }
+    },
+    orderBy: {
+      Games: {
+        _count: 'desc'
+      }
+    }
+  });
 }
 
-export function getGames(season: number = CURRENT_SEASON) {
+export function getGames(season: number = CURRENT_SEASON, allSeasons: boolean = false) {
   const prisma = new PrismaClient();
   return prisma.game.findMany({
-    where: { season },
+    where: allSeasons ? undefined : { season },
     include: { players: true, scores: true },
+    orderBy: { date: 'desc' },
   });
 }
 

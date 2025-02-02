@@ -1,7 +1,13 @@
 import { Player, Score } from "@prisma/client";
 
+export interface PlayerWithCount extends Player {
+  _count: {
+    Games: number;
+  };
+}
+
 export function getNonAssignedPlayers(
-  allPlayers: Player[],
+  allPlayers: PlayerWithCount[],
   attendingPlayers: Player[]
 ) {
   const attendingSet = new Set(attendingPlayers.map((p) => p.id));

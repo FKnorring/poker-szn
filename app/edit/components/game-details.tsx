@@ -18,13 +18,28 @@ import { columns } from "./columns";
 import { toast } from "sonner";
 import Seating from "./seating";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
-export default function GameDetails({ game }: { game: ExtendedGame }) {
+interface GameDetailsProps {
+  game: ExtendedGame;
+  onGameRemoved: (gameId: number) => void;
+}
+
+export default function GameDetails({ game, onGameRemoved }: GameDetailsProps) {
   const { players } = useEditGame();
   const [gamePlayers, setGamePlayers] = useState(game.players);
   const [scoredPlayers, setScoredPlayers] = useState(
     getPlayerScores(game.scores, gamePlayers)
   );
+  const [showRemoveDialog, setShowRemoveDialog] = useState(false);
 
   const { moneyIn, moneyOut } = getGameMoney(scoredPlayers);
 
@@ -106,6 +121,8 @@ export default function GameDetails({ game }: { game: ExtendedGame }) {
 
   async function handleGameRemove() {
     await handleRemoveGame(game.id);
+    onGameRemoved(game.id);
+    setShowRemoveDialog(false);
     toast("Matchen har tagits bort!", {
       description: new Date().toLocaleTimeString("sv-SE"),
     });
@@ -154,14 +171,41 @@ export default function GameDetails({ game }: { game: ExtendedGame }) {
               </div>
             </div>
             <div className="flex content-end">
-              <Button
-                className="flex items-center gap-2"
-                variant="destructive"
-                size="sm"
-                onClick={handleGameRemove}
-              >
-                Ta bort match <X size={16} />
-              </Button>
+              <Dialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>
+                <DialogTrigger asChild>
+                  <Button
+                    className="flex items-center gap-2"
+                    variant="destructive"
+                    size="sm"
+                    type="button"
+                  >
+                    Ta bort match <X size={16} />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Ta bort match</DialogTitle>
+                    <DialogDescription>
+                      Är du säker på att du vill ta bort matchen från {game.date.toLocaleDateString()}? 
+                      Detta går inte att ångra.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <Button
+                      variant="ghost"
+                      onClick={() => setShowRemoveDialog(false)}
+                    >
+                      Avbryt
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={handleGameRemove}
+                    >
+                      Ta bort
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
               <Badge className="ms-auto" variant="default">
                 Snittstack: {Math.floor(moneyIn / (gamePlayers.length || 0))} kr
               </Badge>
