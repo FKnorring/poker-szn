@@ -11,7 +11,7 @@ export default async function Home() {
 
   return (
     <>
-      <Header totalBuyin={totalBuyin} />
+      <Header totalBuyin={totalBuyin} showSeasonSelector />
       <div className="flex gap-4 flex-col lg:flex-row">
         <div className="flex min-h-[85dvh] h-full w-full flex-col gap-2">
           <ChartHandler games={games} players={players} />

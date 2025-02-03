@@ -4,13 +4,16 @@ import { Separator } from "@/components/ui/separator";
 import { Calendar, Spade, Heart, Diamond, Club, Coins, BarChart2 } from "lucide-react";
 import { GeistMono } from "geist/font/mono";
 import { ModeToggle } from "@/components/toggle-theme";
-import { CURRENT } from "@/config/season";
+import { ALL_SEASONS, CURRENT } from "@/config/season";
+import { Select, SelectValue, SelectTrigger, SelectItem, SelectContent } from "./ui/select";
+import { useRouter, usePathname } from "next/navigation";
 
 interface HeaderProps {
   showStats?: boolean;
   showPlay?: boolean;
   showEdit?: boolean;
   showThemeToggle?: boolean;
+  showSeasonSelector?: boolean;
   totalBuyin?: number;
 }
 
@@ -19,8 +22,15 @@ export default function Header({
   showPlay = true,
   showEdit = true,
   showThemeToggle = true,
+  showSeasonSelector = false,
   totalBuyin,
 }: HeaderProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const currentSeasonId = pathname === "/" ? CURRENT.id.toString() : 
+    pathname === "/all" ? "all" : 
+    pathname.slice(1);
+
   return (
     <>
       <div className="flex items-center gap-2">
@@ -46,6 +56,21 @@ export default function Header({
           <span className="hidden lg:block ml-2 text-xs font-bold text-gray-300">
             total buyin {totalBuyin * 100}kr
           </span>
+        )}
+        {showSeasonSelector && (
+          <Select value={currentSeasonId} onValueChange={(value) => router.push(`/${value === CURRENT.id.toString() ? "" : value}`)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Välj säsong" />
+            </SelectTrigger>
+            <SelectContent>
+              {ALL_SEASONS.map((season) => (
+                <SelectItem key={season.id} value={season.id.toString()}>
+                  {season.name}
+                </SelectItem>
+              ))}
+              <SelectItem value="all">Alla</SelectItem>
+            </SelectContent>
+          </Select>
         )}
         <div className="ms-auto flex gap-2 items-center">
           {showThemeToggle && (
