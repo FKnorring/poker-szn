@@ -24,7 +24,7 @@ export default async function EditGames({
 
   return (
     <>
-      <Header showStats />
+      <Header statsLink={`/pokerroom/${room}`} />
       <Games games={games} players={players} />
     </>
   );

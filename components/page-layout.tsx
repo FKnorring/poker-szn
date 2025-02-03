@@ -8,9 +8,6 @@ type PageLayoutProps = {
   players: Player[];
   totalBuyin: number;
   room: PokerRoom & { seasons: { id: string; name: string }[] };
-  showEditButton?: boolean;
-  showSeasonSelector?: boolean;
-  currentSeasonId?: string;
 };
 
 export default function PageLayout({
@@ -18,19 +15,10 @@ export default function PageLayout({
   players,
   totalBuyin,
   room,
-  showEditButton = false,
-  showSeasonSelector = false,
-  currentSeasonId,
 }: PageLayoutProps) {
   return (
     <>
-      <Header
-        editLink={`/pokerroom/${room.id}/edit`}
-        showSeasonSelector={showSeasonSelector}
-        roomId={room.id}
-        seasons={room.seasons}
-        currentSeasonId={currentSeasonId}
-      />
+      <Header editLink={`/pokerroom/${room.id}/edit`} />
       <main className="container mx-auto px-4 py-8">
         <div className="space-y-8">
           <div>

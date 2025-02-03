@@ -8,28 +8,21 @@ import { Season } from "@prisma/client";
 import { LoginLink, LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import SeasonSelector from "./season-selector";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import { UserNav } from "./user-nav";
 
 interface HeaderProps {
-  showStats?: boolean;
+  statsLink?: string;
   editLink?: string;
   showThemeToggle?: boolean;
-  showSeasonSelector?: boolean;
-  totalBuyin?: number;
-  roomId?: string;
-  seasons?: Pick<Season, "id" | "name">[];
-  currentSeasonId?: string;
 }
 
 export default async function Header({
-  showStats = false,
+  statsLink,
   editLink,
   showThemeToggle = true,
-  showSeasonSelector = false,
-  roomId,
-  seasons = [],
-  currentSeasonId,
 }: HeaderProps) {
-  const { isAuthenticated } = getKindeServerSession();
+  const { isAuthenticated, getUser } = getKindeServerSession();
+  const user = await getUser();
 
   const isAuth = await isAuthenticated();
 
@@ -65,13 +58,6 @@ export default async function Header({
             POKER-SZN
           </h1>
         </Link>
-        {showSeasonSelector && roomId && (
-          <SeasonSelector
-            roomId={roomId}
-            seasons={seasons}
-            currentSeasonId={currentSeasonId}
-          />
-        )}
         <div className="ms-auto flex gap-2 items-center">
           {showThemeToggle && (
             <div className="hidden lg:block">
@@ -85,18 +71,15 @@ export default async function Header({
               </Button>
             </Link>
           )}
-          {showStats && (
-            <Link href="/">
-              <Button className="gap-2">
+          {statsLink && (
+            <Link href={statsLink}>
+              <Button size="icon">
                 <BarChart2 size={16} />
-                Show Stats
               </Button>
             </Link>
           )}
           {isAuth ? (
-            <LogoutLink>
-              <Button>Log out</Button>
-            </LogoutLink>
+            <UserNav user={user} editLink={editLink} />
           ) : (
             <LoginLink>
               <Button>Log in</Button>
