@@ -87,6 +87,8 @@ export default function TotalChart({
               type="monotone"
               dataKey={name}
               stroke={stringToColorHash(name)}
+              strokeWidth={2.5}
+              dot={{ r: 4 }}
               activeDot={{ r: 8 }}
             />
           ))}
