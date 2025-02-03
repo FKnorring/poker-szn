@@ -2,6 +2,7 @@ import { Player, PokerRoom } from "@prisma/client";
 import ChartHandler from "./chart-handler";
 import Header from "./header";
 import { ExtendedGame } from "@/app/pokerroom/[room]/edit/games";
+import SeasonSelector from "./season-selector";
 
 type PageLayoutProps = {
   games: ExtendedGame[];
@@ -21,11 +22,18 @@ export default function PageLayout({
       <Header editLink={`/pokerroom/${room.id}/edit`} />
       <main className="container mx-auto px-4 py-8">
         <div className="space-y-8">
-          <div>
-            <h1 className="text-3xl font-bold">{room.name}</h1>
-            <p className="text-muted-foreground">
-              Total buy-ins: {room.currency} {totalBuyin}
-            </p>
+          <div className="flex items-center">
+            <div className="mr-8">
+              <h1 className="text-3xl font-bold">{room.name}</h1>
+              <p className="text-muted-foreground">
+                Total buyin: {room.currency} {totalBuyin}
+              </p>
+            </div>
+            <SeasonSelector
+              roomId={room.id}
+              seasons={room.seasons}
+              currentSeasonId={room.seasons[0].id}
+            />
           </div>
           <ChartHandler
             games={games}

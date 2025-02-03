@@ -28,7 +28,7 @@ export default async function Header({
 
   return (
     <>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 w-full max-w-7xl mx-auto justify-between">
         <Link href="/" className="flex items-center gap-2">
           <div className="grid grid-cols-2 grid-rows-2 rounded-sm overflow-hidden">
             <Heart
