@@ -19,17 +19,10 @@ export async function getRoomData(roomId: string) {
     return null;
   }
 
-  // Get the latest season
-  const latestSeason = room.seasons[0];
-  if (!latestSeason) {
-    return { room, games: [], players: [], totalBuyin: 0 };
-  }
-
   // Get all games for the latest season
   const games = await prisma.game.findMany({
     where: {
       roomId: room.id,
-      seasonId: latestSeason.id,
     },
     include: {
       scores: {

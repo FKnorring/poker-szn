@@ -10,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useTheme } from "next-themes";
 import { Badge } from "./ui/badge";
 import {
   stringToColorHash,
@@ -33,6 +32,7 @@ import RateChart from "./charts/hourly-rate-chart";
 interface ChartHandlerProps {
   games: ExtendedGame[];
   players: Player[];
+  currency?: string;
 }
 
 function DrawPlayer({ name, onClick }: { name: string; onClick: () => void }) {
@@ -129,7 +129,11 @@ const charts = {
 
 const chartKeys = Object.keys(charts) as (keyof typeof charts)[];
 
-export default function ChartHandler({ games, players }: ChartHandlerProps) {
+export default function ChartHandler({
+  games,
+  players,
+  currency = "kr",
+}: ChartHandlerProps) {
   const latestGame = games.sort(
     (a, b) => b.date.getTime() - a.date.getTime()
   )[0];
@@ -181,13 +185,15 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
       setshowPlayers(new Set());
       return;
     }
-    const game = games.find((game) => game.id === Number(gameId));
+    const game = games.find((game) => game.id === gameId);
     if (!game) {
+      console.error("Game not found");
       return;
     }
+    console.log(game);
     const newSet = new Set<string>();
-    game.players.forEach((player) => {
-      newSet.add(player.name);
+    game.scores.forEach((score) => {
+      newSet.add(score.player.name);
     });
     setshowPlayers(newSet);
   }

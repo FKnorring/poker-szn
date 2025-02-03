@@ -10,33 +10,28 @@ import {
 } from "@/components/ui/select";
 import { Season } from "@prisma/client";
 import { Label } from "./ui/label";
+import { ExtendedGame } from "@/app/pokerroom/[room]/edit/games";
+import { useState } from "react";
 
 interface SeasonSelectorProps {
-  roomId: string;
   seasons: Pick<Season, "id" | "name">[];
-  currentSeasonId?: string;
+  selectedSeason: string;
+  onSeasonChange: (season: string) => void;
 }
 
 export default function SeasonSelector({
-  roomId,
   seasons,
-  currentSeasonId,
+  selectedSeason,
+  onSeasonChange,
 }: SeasonSelectorProps) {
-  const router = useRouter();
+  const handleSeasonChange = (value: string) => {
+    onSeasonChange(value);
+  };
 
   return (
     <div className="flex items-center gap-2">
       <Label className="hidden lg:block">Season</Label>
-      <Select
-        value={currentSeasonId || seasons[0]?.id}
-        onValueChange={(value) => {
-          if (value === "all") {
-            router.push(`/pokerroom/${roomId}/all`);
-          } else {
-            router.push(`/pokerroom/${roomId}/${value}`);
-          }
-        }}
-      >
+      <Select value={selectedSeason} onValueChange={handleSeasonChange}>
         <SelectTrigger className="w-[90px] lg:w-[180px]">
           <SelectValue placeholder="Select season" />
         </SelectTrigger>

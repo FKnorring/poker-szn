@@ -2,7 +2,11 @@
 import { Game, Player, Score } from "@prisma/client";
 import { useOptimistic, useRef, useState } from "react";
 import { EditGameProvider, useEditGame } from "./context";
-import { getNonAssignedPlayers, getPlayerScores, PlayerWithCount } from "./utils";
+import {
+  getNonAssignedPlayers,
+  getPlayerScores,
+  PlayerWithCount,
+} from "./utils";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronRight, Plus, X, Zap } from "lucide-react";
 import { handleAddGame, handleAddPlayerToGame } from "./api";
@@ -19,7 +23,9 @@ import {
 import ListGame from "./components/list-game";
 import { toast } from "sonner";
 
-export type ExtendedGame = Game & { players: Player[] } & { scores: Score[] };
+export type ExtendedGame = Game & { players: Player[] } & {
+  scores: Score & { player: Player }[];
+};
 
 interface GamesProps {
   games: ExtendedGame[];
@@ -27,11 +33,11 @@ interface GamesProps {
 }
 
 export default function Games({ games, players }: GamesProps) {
-  const [selectedGame, setSelectedGame] = useState<number | null>(null);
+  const [selectedGame, setSelectedGame] = useState<string | null>(null);
   const [_players, setPlayers] = useState(players);
   const [_games, setGames] = useState(games);
 
-  function selectGame(gameId: number) {
+  function selectGame(gameId: string) {
     if (gameId === selectedGame) {
       setSelectedGame(null);
       return;
@@ -44,10 +50,9 @@ export default function Games({ games, players }: GamesProps) {
     if (!date) return;
     const game = await handleAddGame(date);
     const newGame = { ...game, players: [], scores: [] };
-    setGames((games) => [
-      newGame,
-      ...games,
-    ].sort((a, b) => b.date.getTime() - a.date.getTime()));
+    setGames((games) =>
+      [newGame, ...games].sort((a, b) => b.date.getTime() - a.date.getTime())
+    );
     setSelectedGame(game.id);
     toast("Matchen har lagts till!", {
       description: new Date(date).toLocaleDateString("sv-SE"),
@@ -55,20 +60,19 @@ export default function Games({ games, players }: GamesProps) {
   }
 
   async function handleQuickAddGame() {
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0];
     const game = await handleAddGame(today);
     const newGame = { ...game, players: [], scores: [] };
-    setGames((games) => [
-      newGame,
-      ...games,
-    ].sort((a, b) => b.date.getTime() - a.date.getTime()));
+    setGames((games) =>
+      [newGame, ...games].sort((a, b) => b.date.getTime() - a.date.getTime())
+    );
     setSelectedGame(game.id);
     toast("Matchen har lagts till!", {
       description: "Dagens datum: " + new Date().toLocaleDateString("sv-SE"),
     });
   }
 
-  function handleGameRemoved(gameId: number) {
+  function handleGameRemoved(gameId: string) {
     setGames((games) => games.filter((game) => game.id !== gameId));
     if (selectedGame === gameId) {
       setSelectedGame(null);
