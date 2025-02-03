@@ -1,29 +1,34 @@
+import prisma from "@/lib/prisma";
 import { getGames, getPlayers, getTotalBuyin } from "../utils";
-import { ALL_SEASONS, CURRENT } from "@/config/season";
-import { redirect } from "next/navigation";
 
-export async function getPageData(seasonParam?: string) {
+export async function getPageData(roomId: string, seasonId?: string) {
+  let _seasonId = seasonId;
   // If no season param, use current season
-  if (!seasonParam) {
-    const games = await getGames();
-    const players = await getPlayers(CURRENT.id);
-    const totalBuyin = await getTotalBuyin();
-    return { games, players, totalBuyin };
+  if (!seasonId) {
+    const latestSeason = await prisma.season.findFirst({
+      where: {
+        roomId,
+      },
+      select: {
+        id: true,
+      },
+      orderBy: {
+        startDate: "desc",
+      },
+    });
+    if (!latestSeason) {
+      throw new Error("No season found");
+    }
+    _seasonId = latestSeason.id;
   }
 
-  // Validate season param
-  const isValidSeason =
-    seasonParam === "all" ||
-    ALL_SEASONS.some((s) => s.id.toString() === seasonParam);
-  if (!isValidSeason) {
-    redirect("/");
+  if (_seasonId === "all") {
+    _seasonId = undefined;
   }
 
-  // Get data for specific season
-  const seasonNumber = parseInt(seasonParam, 10);
-  const games = await getGames(seasonNumber, seasonParam === "all");
-  const players = await getPlayers(seasonNumber, seasonParam === "all");
-  const totalBuyin = await getTotalBuyin();
+  const games = await getGames(roomId, _seasonId);
+  const players = await getPlayers(roomId, _seasonId);
+  const totalBuyin = await getTotalBuyin(roomId);
 
   return { games, players, totalBuyin };
 }

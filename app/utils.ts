@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { CURRENT } from "@/config/season";
+import prisma from "@/lib/prisma";
 
 const CURRENT_SEASON = CURRENT.id;
 
@@ -8,91 +9,104 @@ export function revalidateAll() {
   revalidatePath("/", "layout");
 }
 
-export function getPlayers(season?: number, allSeasons: boolean = false) {
-  const prisma = new PrismaClient();
+export function getPlayers(roomId: string, seasonId?: string) {
   return prisma.player.findMany({
-    where: allSeasons
-      ? undefined
-      : {
-          Games: {
-            some: {
-              season,
-            },
-          },
+    where: {
+      roomId,
+      games: {
+        some: {
+          roomId,
+          seasonId,
         },
+      },
+    },
     include: {
       _count: {
         select: {
-          Games: true,
+          games: true,
         },
       },
     },
     orderBy: {
-      Games: {
+      games: {
         _count: "desc",
       },
     },
   });
 }
 
-export function getGames(
-  season: number = CURRENT_SEASON,
-  allSeasons: boolean = false
-) {
-  const prisma = new PrismaClient();
+export function getGames(roomId: string, seasonId?: string) {
   return prisma.game.findMany({
-    where: allSeasons ? undefined : { season },
+    where: {
+      roomId,
+      seasonId,
+    },
     include: { players: true, scores: true },
     orderBy: { date: "desc" },
   });
 }
 
 export function getScores() {
-  const prisma = new PrismaClient();
   return prisma.score.findMany();
 }
 
-export function getGame(id: number) {
-  const prisma = new PrismaClient();
+export function getGame(id: string) {
   return prisma.game.findUnique({
     where: { id },
   });
 }
 
-export async function addPlayer(name: string) {
-  const prisma = new PrismaClient();
+export async function addPlayer(name: string, roomId: string) {
   const res = await prisma.player.create({
     data: {
       name,
+      room: {
+        connect: {
+          id: roomId,
+        },
+      },
     },
   });
   revalidateAll();
   return res;
 }
 
-export async function addGame(date: Date) {
-  const prisma = new PrismaClient();
+export async function addGame(date: Date, seasonId: string, roomId: string) {
   const res = await prisma.game.create({
     data: {
       date,
-      season: CURRENT_SEASON,
+      season: {
+        connect: {
+          id: seasonId,
+        },
+      },
+      room: {
+        connect: {
+          id: roomId,
+        },
+      },
     },
   });
+
   revalidateAll();
   return res;
 }
 
-export async function addNewPlayerToGame(name: string, gameId: number) {
-  const player = await addPlayer(name);
+export async function addNewPlayerToGame(
+  name: string,
+  gameId: string,
+  roomId: string
+) {
+  const player = await addPlayer(name, roomId);
   const { game, score } = await addPlayerToGame(player.id, gameId);
   revalidateAll();
   return { player, game, score };
 }
 
-export async function addPlayerToGame(playerId: number, gameId: number) {
-  const prisma = new PrismaClient();
+export async function addPlayerToGame(playerId: string, gameId: string) {
   const game = await prisma.game.update({
     where: { id: gameId },
+
     data: {
       players: {
         connect: {
@@ -121,7 +135,7 @@ export async function addPlayerToGame(playerId: number, gameId: number) {
   return { game, score };
 }
 
-export async function removeGame(id: number) {
+export async function removeGame(id: string) {
   const prisma = new PrismaClient();
   const score = await prisma.score.deleteMany({
     where: { gameId: id },
@@ -133,10 +147,11 @@ export async function removeGame(id: number) {
   return { game, score };
 }
 
-export async function removePlayerFromGame(playerId: number, gameId: number) {
+export async function removePlayerFromGame(playerId: string, gameId: string) {
   const prisma = new PrismaClient();
   const game = await prisma.game.update({
     where: { id: gameId },
+
     data: {
       players: {
         disconnect: {
@@ -156,15 +171,15 @@ export async function removePlayerFromGame(playerId: number, gameId: number) {
 }
 
 export async function updateScores(
-  scores: { playerId: number; buyins: number; stack: number }[],
-  gameId: number
+  scores: { playerId: string; buyins: number; stack: number }[],
+  gameId: string
 ) {
   const prisma = new PrismaClient();
 
   const transactions = scores.map(({ playerId, buyins, stack }) =>
     prisma.score.update({
       where: {
-        playerId_gameId: {
+        gameId_playerId: {
           gameId,
           playerId,
         },
@@ -186,15 +201,15 @@ export async function updateScore({
   stack,
   gameId,
 }: {
-  playerId: number;
+  playerId: string;
   buyins: number;
   stack: number;
-  gameId: number;
+  gameId: string;
 }) {
   const prisma = new PrismaClient();
   const res = await prisma.score.update({
     where: {
-      playerId_gameId: {
+      gameId_playerId: {
         gameId,
         playerId,
       },
@@ -218,10 +233,15 @@ export function fetchLatestGame() {
   });
 }
 
-export function getTotalBuyin() {
-  const prisma = new PrismaClient();
+export function getTotalBuyin(roomId: string) {
   return prisma.score
     .aggregate({
+      where: {
+        game: {
+          roomId,
+        },
+      },
+
       _sum: {
         buyins: true,
       },

@@ -1,54 +1,37 @@
-"use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import {
-  Calendar,
-  Spade,
-  Heart,
-  Diamond,
-  Club,
-  Coins,
-  BarChart2,
-} from "lucide-react";
+import { Calendar, Spade, Heart, Diamond, Club, BarChart2 } from "lucide-react";
 import { GeistMono } from "geist/font/mono";
 import { ModeToggle } from "@/components/toggle-theme";
-import { ALL_SEASONS, CURRENT } from "@/config/season";
-import {
-  Select,
-  SelectValue,
-  SelectTrigger,
-  SelectItem,
-  SelectContent,
-} from "./ui/select";
-import { useRouter, usePathname } from "next/navigation";
-import { Label } from "./ui/label";
+import { Season } from "@prisma/client";
+import { LoginLink, LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
+import SeasonSelector from "./season-selector";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
 interface HeaderProps {
   showStats?: boolean;
-  showPlay?: boolean;
-  showEdit?: boolean;
+  editLink?: string;
   showThemeToggle?: boolean;
   showSeasonSelector?: boolean;
   totalBuyin?: number;
+  roomId?: string;
+  seasons?: Pick<Season, "id" | "name">[];
+  currentSeasonId?: string;
 }
 
-export default function Header({
+export default async function Header({
   showStats = false,
-  showPlay = true,
-  showEdit = true,
+  editLink,
   showThemeToggle = true,
   showSeasonSelector = false,
-  totalBuyin,
+  roomId,
+  seasons = [],
+  currentSeasonId,
 }: HeaderProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const currentSeasonId =
-    pathname === "/"
-      ? CURRENT.id.toString()
-      : pathname === "/all"
-      ? "all"
-      : pathname.slice(1);
+  const { isAuthenticated } = getKindeServerSession();
+
+  const isAuth = await isAuthenticated();
 
   return (
     <>
@@ -82,33 +65,12 @@ export default function Header({
             POKER-SZN
           </h1>
         </Link>
-        {totalBuyin !== undefined && (
-          <span className="hidden lg:block ml-2 text-xs font-bold text-gray-300">
-            total buyin {totalBuyin * 100}kr
-          </span>
-        )}
-        {showSeasonSelector && (
-          <>
-            <Label className="hidden lg:block">Säsong</Label>
-            <Select
-              value={currentSeasonId}
-              onValueChange={(value) =>
-                router.push(`/${value === CURRENT.id.toString() ? "" : value}`)
-              }
-            >
-              <SelectTrigger className="w-[90px] lg:w-[180px]">
-                <SelectValue placeholder="Välj säsong" />
-              </SelectTrigger>
-              <SelectContent>
-                {ALL_SEASONS.map((season) => (
-                  <SelectItem key={season.id} value={season.id.toString()}>
-                    {season.name}
-                  </SelectItem>
-                ))}
-                <SelectItem value="all">Alla</SelectItem>
-              </SelectContent>
-            </Select>
-          </>
+        {showSeasonSelector && roomId && (
+          <SeasonSelector
+            roomId={roomId}
+            seasons={seasons}
+            currentSeasonId={currentSeasonId}
+          />
         )}
         <div className="ms-auto flex gap-2 items-center">
           {showThemeToggle && (
@@ -116,16 +78,8 @@ export default function Header({
               <ModeToggle />
             </div>
           )}
-          {showPlay && (
-            <Link href="/play">
-              <Button variant="destructive" className="gap-1">
-                <Coins size={16} />
-                Spela
-              </Button>
-            </Link>
-          )}
-          {showEdit && (
-            <Link href="/edit">
+          {editLink && (
+            <Link href={editLink}>
               <Button size="icon">
                 <Calendar size={16} />
               </Button>
@@ -135,9 +89,18 @@ export default function Header({
             <Link href="/">
               <Button className="gap-2">
                 <BarChart2 size={16} />
-                Visa Statistik
+                Show Stats
               </Button>
             </Link>
+          )}
+          {isAuth ? (
+            <LogoutLink>
+              <Button>Log out</Button>
+            </LogoutLink>
+          ) : (
+            <LoginLink>
+              <Button>Log in</Button>
+            </LoginLink>
           )}
         </div>
       </div>

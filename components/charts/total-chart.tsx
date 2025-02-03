@@ -1,4 +1,4 @@
-"use client";
+"use client";;
 import {
   LineChart,
   Line,
@@ -21,6 +21,8 @@ import { ExtendedGame } from "@/app/edit/games";
 import { Player } from "@prisma/client";
 import { Payload } from "recharts/types/component/DefaultLegendContent";
 import { extractTotals, stringToColorHash } from "../chart-utils";
+
+import type { JSX } from "react";
 
 interface ChartProps {
   games: ExtendedGame[];

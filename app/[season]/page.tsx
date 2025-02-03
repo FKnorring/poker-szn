@@ -10,11 +10,12 @@ export async function generateStaticParams() {
   ];
 }
 
-export default async function SeasonPage({
-  params,
-}: {
-  params: { season: string };
-}) {
+export default async function SeasonPage(
+  props: {
+    params: Promise<{ season: string }>;
+  }
+) {
+  const params = await props.params;
   const { games, players, totalBuyin } = await getPageData(params.season);
   return <PageLayout games={games} players={players} totalBuyin={totalBuyin} />;
 }

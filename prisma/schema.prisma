@@ -11,33 +11,87 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model Game {
-  id      Int      @id @default(autoincrement())
-  date    DateTime
-  players Player[]
-  scores  Score[]
-  season  Int      @default(0) // Add this line
+model User {
+  id           String        @id
+  email        String        @unique
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  ownedRooms   PokerRoom[]   @relation("RoomCreator")
+  managedRooms RoomManager[]
+}
 
-  @@unique([date], name: "_date")
+model PokerRoom {
+  id           String        @id @default(cuid())
+  name         String        @unique
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  currency     String        @default("kr")
+  defaultBuyIn Float         @default(100)
+  password     String?
+  creator      User          @relation("RoomCreator", fields: [creatorId], references: [id])
+  creatorId    String
+  managers     RoomManager[]
+  players      Player[]
+  games        Game[]
+  seasons      Season[]
+}
+
+model RoomManager {
+  id        String    @id @default(cuid())
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String
+  room      PokerRoom @relation(fields: [roomId], references: [id])
+  roomId    String
+  createdAt DateTime  @default(now())
+
+  @@unique([userId, roomId])
+}
+
+model Season {
+  id        String    @id @default(cuid())
+  name      String
+  startDate DateTime  @default(now())
+  endDate   DateTime?
+  room      PokerRoom @relation(fields: [roomId], references: [id])
+  roomId    String
+  games     Game[]
+
+  @@unique([name, roomId])
+}
+
+model Game {
+  id       String    @id @default(cuid())
+  date     DateTime
+  players  Player[]
+  scores   Score[]
+  season   Season    @relation(fields: [seasonId], references: [id])
+  seasonId String
+  room     PokerRoom @relation(fields: [roomId], references: [id])
+  roomId   String
+  buyIn    Float     @default(100)
+
+  @@unique([date, roomId])
 }
 
 model Score {
-  id       Int    @id @default(autoincrement())
+  id       String @id @default(cuid())
   game     Game   @relation(fields: [gameId], references: [id])
-  gameId   Int
+  gameId   String
   player   Player @relation(fields: [playerId], references: [id])
-  playerId Int
+  playerId String
   buyins   Float
   stack    Float
 
-  @@unique([gameId, playerId], name: "playerId_gameId")
+  @@unique([gameId, playerId])
 }
 
 model Player {
-  id    Int     @id @default(autoincrement())
-  name  String
-  Games Game[]
-  Score Score[]
+  id     String    @id @default(cuid())
+  name   String
+  room   PokerRoom @relation(fields: [roomId], references: [id])
+  roomId String
+  games  Game[]
+  scores Score[]
 
-  @@unique([name], name: "_name")
+  @@unique([name, roomId])
 }

@@ -1,32 +1,51 @@
-import ChartHandler from "@/components/chart-handler";
-import { Separator } from "@/components/ui/separator";
-import Leaderboard from "@/components/leaderboard";
-import Header from "@/components/header";
-import { ExtendedGame } from "@/app/edit/games";
-import { Player } from "@prisma/client";
+import { Player, PokerRoom } from "@prisma/client";
+import ChartHandler from "./chart-handler";
+import Header from "./header";
+import { ExtendedGame } from "@/app/pokerroom/[room]/edit/games";
 
-interface PageLayoutProps {
+type PageLayoutProps = {
   games: ExtendedGame[];
   players: Player[];
   totalBuyin: number;
-}
+  room: PokerRoom & { seasons: { id: string; name: string }[] };
+  showEditButton?: boolean;
+  showSeasonSelector?: boolean;
+  currentSeasonId?: string;
+};
 
 export default function PageLayout({
   games,
   players,
   totalBuyin,
+  room,
+  showEditButton = false,
+  showSeasonSelector = false,
+  currentSeasonId,
 }: PageLayoutProps) {
   return (
     <>
-      <Header totalBuyin={totalBuyin} showSeasonSelector />
-      <div className="flex-1 flex gap-4 flex-col lg:flex-row">
-        <div className="flex-1 flex flex-col gap-2 min-h-0">
-          <ChartHandler games={games} players={players} />
+      <Header
+        editLink={`/pokerroom/${room.id}/edit`}
+        showSeasonSelector={showSeasonSelector}
+        roomId={room.id}
+        seasons={room.seasons}
+        currentSeasonId={currentSeasonId}
+      />
+      <main className="container mx-auto px-4 py-8">
+        <div className="space-y-8">
+          <div>
+            <h1 className="text-3xl font-bold">{room.name}</h1>
+            <p className="text-muted-foreground">
+              Total buy-ins: {room.currency} {totalBuyin}
+            </p>
+          </div>
+          <ChartHandler
+            games={games}
+            players={players}
+            currency={room.currency}
+          />
         </div>
-        <Separator orientation="horizontal" className="lg:hidden" />
-        <Separator orientation="vertical" className="hidden lg:block" />
-        <Leaderboard games={games} players={players} />
-      </div>
+      </main>
     </>
   );
 }

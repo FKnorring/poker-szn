@@ -27,7 +27,7 @@ export function DatePicker() {
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? date.toLocaleDateString() : <span>Välj ett datum</span>}
+          {date ? format(date, "PPP") : <span>Pick a date</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">
@@ -38,7 +38,6 @@ export function DatePicker() {
           initialFocus
         />
       </PopoverContent>
-      <input name="date" type="hidden" value={date?.toISOString()} />
     </Popover>
   );
 }
