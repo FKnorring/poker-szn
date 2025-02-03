@@ -33,7 +33,7 @@ export default async function Home({ params }: { params: { season: string } }) {
   const seasonNumber = parseInt(season as string, 10);
 
   const games = await getGames(seasonNumber, season === "all");
-  const players = await getPlayers();
+  const players = await getPlayers(seasonNumber, season === "all");
   const totalBuyin = await getTotalBuyin();
 
   return (

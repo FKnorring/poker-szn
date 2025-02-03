@@ -50,7 +50,7 @@ export default async function EditGames() {
   }
 
   const games = await getGames(undefined, true);
-  const players = await getPlayers();
+  const players = await getPlayers(undefined, true);
 
   return (
     <>

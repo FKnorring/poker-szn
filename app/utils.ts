@@ -8,9 +8,18 @@ export function revalidateAll() {
   revalidatePath("/", "layout");
 }
 
-export function getPlayers() {
+export function getPlayers(season?: number, allSeasons: boolean = false) {
   const prisma = new PrismaClient();
   return prisma.player.findMany({
+    where: allSeasons
+      ? undefined
+      : {
+          Games: {
+            some: {
+              season,
+            },
+          },
+        },
     include: {
       _count: {
         select: {
