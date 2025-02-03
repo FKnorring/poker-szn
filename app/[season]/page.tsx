@@ -10,14 +10,29 @@ import { Calendar, Spade, Heart, Diamond, Club, Coins } from "lucide-react";
 import { GeistMono } from "geist/font/mono";
 import { ModeToggle } from "@/components/toggle-theme";
 import Header from "@/components/header";
+import { redirect } from "next/navigation";
+import { ALL_SEASONS } from "@/config/season";
+
+export async function generateStaticParams() {
+  return [
+    ...ALL_SEASONS.map((season) => ({ season: season.id.toString() })),
+    { season: "all" },
+  ];
+}
 
 export default async function Home({ params }: { params: { season: string } }) {
   const { season } = params;
 
+  const isValidSeason =
+    season === "all" || ALL_SEASONS.some((s) => s.id.toString() === season);
+  if (!isValidSeason) {
+    redirect("/");
+  }
+
   // Ensure season is a number
   const seasonNumber = parseInt(season as string, 10);
 
-  const games = await getGames(seasonNumber, season === 'all');
+  const games = await getGames(seasonNumber, season === "all");
   const players = await getPlayers();
   const totalBuyin = await getTotalBuyin();
 

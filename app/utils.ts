@@ -14,24 +14,27 @@ export function getPlayers() {
     include: {
       _count: {
         select: {
-          Games: true
-        }
-      }
+          Games: true,
+        },
+      },
     },
     orderBy: {
       Games: {
-        _count: 'desc'
-      }
-    }
+        _count: "desc",
+      },
+    },
   });
 }
 
-export function getGames(season: number = CURRENT_SEASON, allSeasons: boolean = false) {
+export function getGames(
+  season: number = CURRENT_SEASON,
+  allSeasons: boolean = false
+) {
   const prisma = new PrismaClient();
   return prisma.game.findMany({
     where: allSeasons ? undefined : { season },
     include: { players: true, scores: true },
-    orderBy: { date: 'desc' },
+    orderBy: { date: "desc" },
   });
 }
 

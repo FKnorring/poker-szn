@@ -13,6 +13,11 @@ import {
 import { ExtendedGame } from "@/app/edit/games";
 import { Player } from "@prisma/client";
 import { calculateTotalBuyin, stringToColorHash } from "../chart-utils";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
 interface ChartProps {
   games: ExtendedGame[];
@@ -23,7 +28,15 @@ export default function BuyinChart({ games, players }: ChartProps) {
   const data = calculateTotalBuyin(games, players);
 
   return (
-    <ResponsiveContainer width="100%" className="flex-grow">
+    <ChartContainer
+      config={{
+        buyin: {
+          label: "Total buyin",
+          color: "#8884d8",
+        },
+      }}
+      className="flex-1"
+    >
       <BarChart data={data}>
         <XAxis
           interval={0}
@@ -63,22 +76,9 @@ export default function BuyinChart({ games, players }: ChartProps) {
           label={{ value: "Total buyin", angle: -90, position: "insideLeft" }}
         />
         <CartesianGrid strokeDasharray="3 3" />
-        <Tooltip
-          content={({ payload, label }) => (
-            <div className="bg-white p-4 shadow-md rounded-md border">
-              <p className="text-sm font-bold">{label}</p>
-              <ul className="text-xs flex flex-col gap-1">
-                {payload?.map((entry) => (
-                  <li key={entry.dataKey}>
-                    Total buyin: {entry.value?.toLocaleString()}kr
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        />
-        <Bar dataKey="buyin" fill="#8884d8" />
+        <ChartTooltip content={<ChartTooltipContent />} />
+        <Bar dataKey="buyin" fill="var(--color-buyin)" />
       </BarChart>
-    </ResponsiveContainer>
+    </ChartContainer>
   );
 }

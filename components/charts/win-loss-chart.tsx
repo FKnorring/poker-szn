@@ -17,6 +17,11 @@ import {
   extractWinsLossesData,
   stringToColorHash,
 } from "../chart-utils";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
 interface ChartProps {
   games: ExtendedGame[];
@@ -27,7 +32,19 @@ export default function WinLossChart({ games, players }: ChartProps) {
   const data = extractWinsLossesData(games, players);
 
   return (
-    <ResponsiveContainer width="100%">
+    <ChartContainer
+      config={{
+        wins: {
+          label: "Vinster",
+          color: "#82ca9d",
+        },
+        losses: {
+          label: "Förluster",
+          color: "#d45079",
+        },
+      }}
+      className="flex-1"
+    >
       <BarChart data={data}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis
@@ -65,25 +82,11 @@ export default function WinLossChart({ games, players }: ChartProps) {
           dataKey="name"
         />
         <YAxis />
-        <Tooltip
-          content={({ payload, label }) => (
-            <div className="bg-white p-4 shadow-md rounded-md border">
-              <p className="text-sm font-bold">{label}</p>
-              <ul className="text-xs flex flex-col gap-1">
-                {payload?.map((entry) => (
-                  <li key={entry.dataKey}>
-                    {entry.name}: {entry.value?.toLocaleString()}
-                  </li>
-                ))}
-                <li></li>
-              </ul>
-            </div>
-          )}
-        />
+        <ChartTooltip content={<ChartTooltipContent />} />
         <Legend />
-        <Bar dataKey="wins" fill="#82ca9d" name="Vinster" />
-        <Bar dataKey="losses" fill="#d45079" name="Förluster" />
+        <Bar dataKey="wins" fill="var(--color-wins)" name="Vinster" />
+        <Bar dataKey="losses" fill="var(--color-losses)" name="Förluster" />
       </BarChart>
-    </ResponsiveContainer>
+    </ChartContainer>
   );
 }

@@ -205,9 +205,10 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
         <GameSelect
           games={games}
           onValueChange={handleSelectPlayersFromMatch}
+          defaultValue={latestGame?.id.toString()}
         />
         {/** @ts-ignore */}
-        <ChartSelect onValueChange={setChart} />
+        <ChartSelect onValueChange={setChart} defaultValue={chart} />
         <Button
           onClick={() => setSlideshow((prev) => !prev)}
           className="p-2 aspect-square rounded-md cursor-pointer"
@@ -224,17 +225,19 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
           />
         ))}
       </ul>
-      {charts[chart]({
-        games,
-        players: filteredPlayers,
-        renderPlayer: (entry) => (
-          <DrawPlayer
-            name={entry.value}
-            onClick={() => filterPlayer(entry.value)}
-          />
-        ),
-        includeLatest,
-      })}
+      <div className="flex-1 w-full">
+        {charts[chart]({
+          games,
+          players: filteredPlayers,
+          renderPlayer: (entry) => (
+            <DrawPlayer
+              name={entry.value}
+              onClick={() => filterPlayer(entry.value)}
+            />
+          ),
+          includeLatest,
+        })}
+      </div>
     </>
   );
 }

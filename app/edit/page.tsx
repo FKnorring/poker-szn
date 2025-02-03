@@ -16,7 +16,9 @@ export default async function EditGames() {
   if (!authenticated) {
     return (
       <div className="flex items-center justify-center h-full gap-4 flex-col">
-        <h1 className={`text-4xl font-extrabold tracking-widest ${GeistMono.className}`}>
+        <h1
+          className={`text-4xl font-extrabold tracking-widest ${GeistMono.className}`}
+        >
           POKER SZN HT_24
         </h1>
         <LoginLink className="text-lg text-center">
@@ -30,7 +32,9 @@ export default async function EditGames() {
   if (permissions && !permissions.permissions.includes("edit")) {
     return (
       <div className="flex items-center justify-center h-full gap-4 flex-col">
-        <h1 className={`text-4xl font-extrabold tracking-widest ${GeistMono.className}`}>
+        <h1
+          className={`text-4xl font-extrabold tracking-widest ${GeistMono.className}`}
+        >
           POKER SZN HT_24
         </h1>
         <p className="text-lg text-center">

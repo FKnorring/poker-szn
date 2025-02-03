@@ -16,6 +16,11 @@ import {
   extractAverageBuyinStackData,
   stringToColorHash,
 } from "../chart-utils";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
 interface ChartProps {
   games: ExtendedGame[];
@@ -26,7 +31,19 @@ export default function BuyinStackChart({ games, players }: ChartProps) {
   const data = extractAverageBuyinStackData(games, players);
 
   return (
-    <ResponsiveContainer width="100%">
+    <ChartContainer
+      config={{
+        avgBuyin: {
+          label: "Average Buy-in",
+          color: "#8884d8",
+        },
+        avgStack: {
+          label: "Average Stack",
+          color: "#82ca9d",
+        },
+      }}
+      className="flex-1"
+    >
       <BarChart data={data}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis
@@ -64,32 +81,19 @@ export default function BuyinStackChart({ games, players }: ChartProps) {
           dataKey="name"
         />
         <YAxis />
-        <Tooltip
-          content={({ payload, label }) => {
-            const avgBuyin = payload?.find((p) => p.dataKey === "avgBuyin")
-              ?.value as number;
-            const avgStack = payload?.find((p) => p.dataKey === "avgStack")
-              ?.value as number;
-            const avgGain = (avgStack || 0) - (avgBuyin || 0);
-            return (
-              <div className="bg-white p-4 shadow-md rounded-md border">
-                <p className="text-sm font-bold">{label}</p>
-                <ul className="text-xs flex flex-col gap-1">
-                  {payload?.map((entry) => (
-                    <li key={entry.dataKey}>
-                      {entry.name}: {entry.value?.toLocaleString()} kr
-                    </li>
-                  ))}
-                  <li>Average Gain: {avgGain?.toLocaleString()} kr</li>
-                </ul>
-              </div>
-            );
-          }}
-        />
+        <ChartTooltip content={<ChartTooltipContent />} />
         <Legend />
-        <Bar dataKey="avgBuyin" fill="#8884d8" name="Average Buy-in" />
-        <Bar dataKey="avgStack" fill="#82ca9d" name="Average Stack" />
+        <Bar
+          dataKey="avgBuyin"
+          fill="var(--color-avgBuyin)"
+          name="Average Buy-in"
+        />
+        <Bar
+          dataKey="avgStack"
+          fill="var(--color-avgStack)"
+          name="Average Stack"
+        />
       </BarChart>
-    </ResponsiveContainer>
+    </ChartContainer>
   );
 }

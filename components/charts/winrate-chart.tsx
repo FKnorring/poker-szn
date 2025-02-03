@@ -9,10 +9,17 @@ import {
   Legend,
   ResponsiveContainer,
   Brush,
+  Cell,
+  ReferenceLine,
 } from "recharts";
 import { ExtendedGame } from "@/app/edit/games";
 import { Player } from "@prisma/client";
 import { extractWinrate, stringToColorHash } from "../chart-utils";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
 interface ChartProps {
   games: ExtendedGame[];
@@ -23,7 +30,15 @@ export default function WinRateChart({ games, players }: ChartProps) {
   const data = extractWinrate(games, players);
 
   return (
-    <ResponsiveContainer width="100%" className="flex-grow">
+    <ChartContainer
+      config={{
+        winrate: {
+          label: "Vinst (%)",
+          color: "#8884d8",
+        },
+      }}
+      className="flex-1"
+    >
       <BarChart data={data}>
         <XAxis
           interval={0}
@@ -63,22 +78,23 @@ export default function WinRateChart({ games, players }: ChartProps) {
           label={{ value: "Vinst (%)", angle: -90, position: "insideLeft" }}
         />
         <CartesianGrid strokeDasharray="3 3" />
-        <Tooltip
-          content={({ payload, label }) => (
-            <div className="bg-white p-4 shadow-md rounded-md border">
-              <p className="text-sm font-bold">{label}</p>
-              <ul className="text-xs flex flex-col gap-1">
-                {payload?.map((entry) => (
-                  <li key={entry.dataKey}>
-                    Vinst: {entry.value?.toLocaleString()}%
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        />
-        <Bar dataKey="WinRate" fill="#8884d8" />
+        <ChartTooltip content={<ChartTooltipContent />} />
+        <Bar radius={[5, 5, 0, 0]} dataKey="WinRate">
+          {data.map((entry, index) => (
+            <Cell
+              key={`cell-${index}`}
+              fill={
+                entry.WinRate > 50
+                  ? "#22c55e"
+                  : entry.WinRate < 50
+                  ? "#ef4444"
+                  : "#6b7280"
+              }
+            />
+          ))}
+        </Bar>
+        <ReferenceLine y={50} stroke="#6b7280" />
       </BarChart>
-    </ResponsiveContainer>
+    </ChartContainer>
   );
 }
