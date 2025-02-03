@@ -225,19 +225,17 @@ export default function ChartHandler({ games, players }: ChartHandlerProps) {
           />
         ))}
       </ul>
-      <div className="flex-1 w-full">
-        {charts[chart]({
-          games,
-          players: filteredPlayers,
-          renderPlayer: (entry) => (
-            <DrawPlayer
-              name={entry.value}
-              onClick={() => filterPlayer(entry.value)}
-            />
-          ),
-          includeLatest,
-        })}
-      </div>
+      {charts[chart]({
+        games,
+        players: filteredPlayers,
+        renderPlayer: (entry) => (
+          <DrawPlayer
+            name={entry.value}
+            onClick={() => filterPlayer(entry.value)}
+          />
+        ),
+        includeLatest,
+      })}
     </>
   );
 }

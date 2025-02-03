@@ -13,8 +13,8 @@ export default async function Home() {
   return (
     <>
       <Header totalBuyin={totalBuyin} showSeasonSelector />
-      <div className="flex gap-4 flex-col lg:flex-row">
-        <div className="flex min-h-[85dvh] h-full w-full flex-col gap-2">
+      <div className="flex-1 flex gap-4 flex-col lg:flex-row">
+        <div className="flex-1 flex flex-col gap-2 min-h-0">
           <ChartHandler games={games} players={players} />
         </div>
         <Separator orientation="horizontal" className="lg:hidden" />

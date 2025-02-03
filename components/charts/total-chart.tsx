@@ -49,7 +49,7 @@ export default function TotalChart({
           color: "#60a5fa",
         },
       }}
-      className="flex-1 max-h-[75vh] saturate-200"
+      className="flex-1 saturate-200"
     >
       <LineChart accessibilityLayer data={data} className="rounded-md">
         <XAxis dataKey="name" />
