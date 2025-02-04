@@ -1,4 +1,4 @@
-import { getGames, getPlayers } from "@/app/utils";
+import { getGames, getPlayers, getRoom, getSeasons } from "@/app/utils";
 import Games from "./games";
 import Header from "@/components/header";
 import { canEditRoom } from "../actions";
@@ -6,7 +6,7 @@ import { canEditRoom } from "../actions";
 export default async function EditGames({
   params,
 }: {
-  params: { room: string };
+  params: Promise<{ room: string }>;
 }) {
   const { room } = await params;
   const canEdit = await canEditRoom(room);
@@ -21,11 +21,18 @@ export default async function EditGames({
 
   const games = await getGames(room);
   const players = await getPlayers(room);
-
+  const seasons = await getSeasons(room);
+  const dbRoom = await getRoom(room);
   return (
     <>
       <Header statsLink={`/pokerroom/${room}`} />
-      <Games games={games} players={players} />
+      <Games
+        games={games}
+        players={players}
+        seasons={seasons}
+        roomId={room}
+        room={dbRoom}
+      />
     </>
   );
 }

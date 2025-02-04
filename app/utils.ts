@@ -41,8 +41,25 @@ export function getGames(roomId: string, seasonId?: string) {
       roomId,
       seasonId,
     },
-    include: { players: true, scores: true },
+    include: { players: true, scores: { include: { player: true } }, season: true },
     orderBy: { date: "desc" },
+  });
+}
+
+export function getRoom(roomId: string) {
+  return prisma.pokerRoom.findUnique({
+    where: { id: roomId },
+  });
+}
+
+export function getSeasons(roomId: string) {
+  return prisma.season.findMany({
+    where: {
+      roomId,
+    },
+    orderBy: {
+      startDate: "desc",
+    },
   });
 }
 

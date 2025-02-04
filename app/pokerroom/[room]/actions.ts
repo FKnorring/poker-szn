@@ -31,6 +31,7 @@ export async function getRoomData(roomId: string) {
         },
       },
       players: true,
+      season: true,
     },
     orderBy: {
       date: "desc",
