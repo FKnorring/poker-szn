@@ -4,13 +4,14 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Header from "@/components/header";
+import prisma from "@/lib/prisma";
 
 export default async function Home() {
   const { isAuthenticated } = getKindeServerSession();
 
   return (
     <>
-      <Header showEdit={false} />
+      <Header />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto space-y-8">
           <div className="text-center space-y-4">
@@ -45,7 +46,27 @@ export default async function Home() {
             <h2 className="text-2xl font-semibold text-center">
               View Room Statistics
             </h2>
-            <form className="flex gap-4 justify-center">
+            <form
+              action={async (formData) => {
+                "use server";
+                const room = formData.get("room");
+                if (!room) {
+                  console.error("No room provided");
+                  return;
+                }
+                const dbRoom = await prisma.pokerRoom.findFirst({
+                  where: {
+                    OR: [{ id: room as string }, { name: room as string }],
+                  },
+                });
+                if (!dbRoom) {
+                  console.error("Room not found");
+                  return;
+                }
+                redirect(`/pokerroom/${dbRoom.id}`);
+              }}
+              className="flex gap-4 justify-center"
+            >
               <Input
                 name="room"
                 placeholder="Enter room name or ID"
