@@ -21,15 +21,16 @@ import { Player } from "@prisma/client";
 
 interface PlayerWithCount extends Player {
   _count: {
-    Games: number;
+    games: number;
   };
 }
 
 interface AutoCompleteProps {
   players: PlayerWithCount[];
+  roomId: string;
 }
 
-export default function AutoComplete({ players }: AutoCompleteProps) {
+export default function AutoComplete({ players, roomId }: AutoCompleteProps) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
   const [query, setQuery] = useState("");
@@ -41,13 +42,15 @@ export default function AutoComplete({ players }: AutoCompleteProps) {
 
   function addPlayer() {
     setPlayers((players) => {
-      const player = { 
-        id: players.length + 1, 
+      const player = {
+        id: crypto.randomUUID(),
         name: query,
-        _count: { Games: 0 }
+        _count: { games: 0 },
+        roomId,
       };
       return [...players, player];
     });
+
     setValue(query);
     setOpen(false);
   }
@@ -69,7 +72,7 @@ export default function AutoComplete({ players }: AutoCompleteProps) {
             aria-expanded={open}
             className="w-[200px] justify-between"
           >
-            {value || "Sök efter spelare"}
+            {value || "Search for players"}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
@@ -78,14 +81,14 @@ export default function AutoComplete({ players }: AutoCompleteProps) {
             <CommandInput
               value={query}
               onValueChange={(search) => setQuery(search)}
-              placeholder="Sök efter spelare"
+              placeholder="Search for players"
             />
             <CommandEmpty className="flex justify-center py-4">
               <Button
                 onClick={addPlayer}
                 className="flex gap-1 items-center justify-center"
               >
-                Lägg till ny spelare <Plus size={16} />
+                Add new player <Plus size={16} />
               </Button>
             </CommandEmpty>
             <CommandGroup className="max-h-[200px] overflow-y-auto">
@@ -100,7 +103,7 @@ export default function AutoComplete({ players }: AutoCompleteProps) {
                 >
                   <span>{player.name}</span>
                   <span className="text-xs text-muted-foreground">
-                    {player._count.Games}
+                    {player._count.games}
                   </span>
                 </CommandItem>
               ))}

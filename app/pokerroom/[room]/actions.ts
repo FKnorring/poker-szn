@@ -65,7 +65,7 @@ export async function canEditRoom(roomId: string) {
 
   if (!(await isAuthenticated())) {
     console.log("not authenticated");
-    return false;
+    return { canEdit: false, isCreator: false };
   }
 
   const user = await getUser();
@@ -76,11 +76,14 @@ export async function canEditRoom(roomId: string) {
     },
   });
 
-  console.log(room);
-  console.log(user);
-
-  return (
-    room?.creatorId === user?.id ||
-    room?.managers.some((manager) => manager.userId === user?.id)
+  const isManager = room?.managers.some(
+    (manager) => manager.userId === user?.id
   );
+
+  const isCreator = room?.creatorId === user?.id;
+
+  return {
+    canEdit: isCreator || isManager,
+    isCreator,
+  };
 }

@@ -31,7 +31,7 @@ export function useEditGame() {
 interface TableContextProps {
   players: ExtendedPlayer[];
   updatePlayer: (
-    id: number,
+    id: string,
     buyins: number | undefined,
     stack: number | undefined
   ) => void;

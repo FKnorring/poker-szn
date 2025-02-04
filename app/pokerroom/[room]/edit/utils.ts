@@ -30,9 +30,12 @@ export function getPlayerScores(
   });
 }
 
-export const getGameMoney = (scoredPlayers: ExtendedPlayer[]) => {
+export const getGameMoney = (
+  scoredPlayers: ExtendedPlayer[],
+  buyinSize = 100
+) => {
   const moneyIn = scoredPlayers.reduce(
-    (acc, player) => acc + player.buyins * 100,
+    (acc, player) => acc + player.buyins * buyinSize,
     0
   );
   const moneyOut = scoredPlayers.reduce((acc, player) => acc + player.stack, 0);

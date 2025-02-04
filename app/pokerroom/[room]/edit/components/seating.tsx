@@ -20,7 +20,7 @@ interface SeatingProps {
 export default function Seating({ players }: SeatingProps) {
   const [_players, setPlayers] = useState(players);
   const [isTableView, setIsTableView] = useState(true);
-  const [fixedPlayerId, setFixedPlayerId] = useState<number | null>(null);
+  const [fixedPlayerId, setFixedPlayerId] = useState<string | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
   const [tableRotation, setTableRotation] = useState(0);
 
@@ -30,14 +30,14 @@ export default function Seating({ players }: SeatingProps) {
 
   function shufflePlayers() {
     let playersToShuffle = fixedPlayerId
-      ? [..._players.filter(p => p.id !== fixedPlayerId)]
+      ? [..._players.filter((p) => p.id !== fixedPlayerId)]
       : [..._players];
 
     const shuffled = playersToShuffle.sort(() => 0.5 - Math.random());
 
     // If there's a fixed player, add them back at the start
     if (fixedPlayerId) {
-      const fixedPlayer = _players.find(p => p.id === fixedPlayerId);
+      const fixedPlayer = _players.find((p) => p.id === fixedPlayerId);
       if (fixedPlayer) {
         shuffled.unshift(fixedPlayer);
       }
@@ -49,7 +49,7 @@ export default function Seating({ players }: SeatingProps) {
   function randomize() {
     setIsSpinning(true);
     // Spin the table
-    setTableRotation(prev => prev + 360);
+    setTableRotation((prev) => prev + 360);
 
     shufflePlayers();
 
@@ -66,7 +66,7 @@ export default function Seating({ players }: SeatingProps) {
       .join("");
   }
 
-  function toggleFixedPlayer(playerId: number) {
+  function toggleFixedPlayer(playerId: string) {
     if (fixedPlayerId === playerId) {
       setFixedPlayerId(null);
     } else {
@@ -75,20 +75,20 @@ export default function Seating({ players }: SeatingProps) {
   }
 
   const TableView = () => (
-    <div className="relative w-[150px] h-[150px] rounded-full mx-auto bg-slate-900 my-16">
+    <div className="relative w-[150px] h-[150px] rounded-full mx-auto bg-green-900 border-2 border-white my-16">
       <motion.div
         className="absolute inset-0"
         animate={{
-          rotate: tableRotation
+          rotate: tableRotation,
         }}
         transition={{
           duration: 0.2,
-          ease: "easeInOut"
+          ease: "easeInOut",
         }}
       >
         {_players.map((player, i, arr) => {
-          const angle = ((2 * Math.PI * i) / arr.length) - (Math.PI / 2); // Start from top
-          const radius = 100; // Slightly larger than half the container (150/2 = 75)
+          const angle = (2 * Math.PI * i) / arr.length - Math.PI / 2; // Start from top
+          const radius = 110; // Slightly larger than half the container (150/2 = 75)
           const x = Math.cos(angle) * radius;
           const y = Math.sin(angle) * radius;
 
@@ -96,17 +96,19 @@ export default function Seating({ players }: SeatingProps) {
             <motion.div
               key={player.id}
               className={`absolute w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold cursor-pointer
-                ${player.id === fixedPlayerId ? 'bg-green-600' : 'bg-slate-800'}`}
+                ${
+                  player.id === fixedPlayerId ? "bg-green-600" : "bg-slate-800"
+                }`}
               style={{
                 left: x + 60,
                 top: y + 60,
               }}
               animate={{
-                rotate: -tableRotation
+                rotate: -tableRotation,
               }}
               transition={{
                 duration: 0.2,
-                ease: "easeInOut"
+                ease: "easeInOut",
               }}
               onClick={() => toggleFixedPlayer(player.id)}
             >
@@ -124,16 +126,14 @@ export default function Seating({ players }: SeatingProps) {
         <div
           key={player.id}
           className={`flex items-center justify-between p-2 my-1 rounded cursor-pointer
-            ${player.id === fixedPlayerId ? 'bg-green-600' : 'bg-slate-800'}`}
+            ${player.id === fixedPlayerId ? "bg-green-600" : "bg-slate-800"}`}
           onClick={() => toggleFixedPlayer(player.id)}
         >
           <span className="text-white">
             {index + 1}. {player.name}
           </span>
           {player.id === fixedPlayerId && (
-            <span className="text-xs text-white">
-              Fixed
-            </span>
+            <span className="text-xs text-white">Fixed</span>
           )}
         </div>
       ))}
@@ -143,21 +143,21 @@ export default function Seating({ players }: SeatingProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Placering</Button>
+        <Button variant="outline">Seating</Button>
       </DialogTrigger>
       <DialogContent className="w-[95vw] rounded">
         <DialogHeader>
-          <DialogTitle>Placering</DialogTitle>
+          <DialogTitle>Seating</DialogTitle>
         </DialogHeader>
         <DialogDescription>
           <div className="flex items-center justify-end space-x-2 mb-4">
-            <Label htmlFor="view-toggle">Lista</Label>
+            <Label htmlFor="view-toggle">List</Label>
             <Switch
               id="view-toggle"
               checked={isTableView}
               onCheckedChange={setIsTableView}
             />
-            <Label htmlFor="view-toggle">Bord</Label>
+            <Label htmlFor="view-toggle">Table</Label>
           </div>
 
           {isTableView ? <TableView /> : <ListView />}
@@ -167,7 +167,7 @@ export default function Seating({ players }: SeatingProps) {
             onClick={isTableView ? randomize : shufflePlayers}
             disabled={isSpinning}
           >
-            Slumpa platser
+            Shuffle seats
           </Button>
         </DialogDescription>
       </DialogContent>

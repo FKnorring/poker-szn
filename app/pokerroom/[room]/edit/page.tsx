@@ -9,7 +9,7 @@ export default async function EditGames({
   params: Promise<{ room: string }>;
 }) {
   const { room } = await params;
-  const canEdit = await canEditRoom(room);
+  const { canEdit, isCreator } = await canEditRoom(room);
 
   if (!canEdit) {
     return (
@@ -23,6 +23,9 @@ export default async function EditGames({
   const players = await getPlayers(room);
   const seasons = await getSeasons(room);
   const dbRoom = await getRoom(room);
+  if (!dbRoom) {
+    return <div>Room not found</div>;
+  }
   return (
     <>
       <Header statsLink={`/pokerroom/${room}`} />
@@ -32,6 +35,8 @@ export default async function EditGames({
         seasons={seasons}
         roomId={room}
         room={dbRoom}
+        managers={dbRoom.managers}
+        isCreator={isCreator}
       />
     </>
   );

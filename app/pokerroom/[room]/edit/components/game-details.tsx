@@ -1,4 +1,4 @@
-import { Game, Player, Score } from "@prisma/client";
+import { Game, Player, PokerRoom, Score, Season } from "@prisma/client";
 import { TableProvider, useEditGame } from "../context";
 import { useOptimistic, useRef, useState } from "react";
 import { getGameMoney, getNonAssignedPlayers, getPlayerScores } from "../utils";
@@ -27,13 +27,22 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import GameSettings from "./game-settings";
+import { updateGameSettings } from "../api";
 
 interface GameDetailsProps {
   game: ExtendedGame;
   onGameRemoved: (gameId: string) => void;
+  room: PokerRoom;
+  seasons: Season[];
 }
 
-export default function GameDetails({ game, onGameRemoved }: GameDetailsProps) {
+export default function GameDetails({
+  game,
+  onGameRemoved,
+  room,
+  seasons,
+}: GameDetailsProps) {
   const { players } = useEditGame();
   const [gamePlayers, setGamePlayers] = useState(game.players);
   const [scoredPlayers, setScoredPlayers] = useState(
@@ -41,7 +50,7 @@ export default function GameDetails({ game, onGameRemoved }: GameDetailsProps) {
   );
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
 
-  const { moneyIn, moneyOut } = getGameMoney(scoredPlayers);
+  const { moneyIn, moneyOut } = getGameMoney(scoredPlayers, game.buyIn);
 
   const nonAssignedPlayers = getNonAssignedPlayers(players, gamePlayers);
 
@@ -70,15 +79,18 @@ export default function GameDetails({ game, onGameRemoved }: GameDetailsProps) {
     const player = players.find((player) => player.name === name);
     if (gamePlayers.some((p) => p.id === player?.id)) return;
     if (!player) {
-      const { player } = await handleAddNewPlayerToGame(name, game.id);
+      const { player } = await handleAddNewPlayerToGame(name, game.id, room.id);
       setGamePlayers((players) => [...players, player]);
       setScoredPlayers((players) => [
         ...players,
+
         { ...player, buyins: 1, stack: 100 },
       ]);
-      return toast(`Ny spelare ${name} har lagts till i matchen!`, {
+      toast(`New player ${name} has been added to the game!`, {
         description: new Date().toLocaleTimeString("sv-SE"),
       });
+
+      return;
     }
     await handleAddPlayerToGame(player.id, game.id);
     setGamePlayers((players) => [...players, player]);
@@ -86,13 +98,13 @@ export default function GameDetails({ game, onGameRemoved }: GameDetailsProps) {
       ...players,
       { ...player, buyins: 1, stack: 100 },
     ]);
-    toast(`${name} har lagts till i matchen!`, {
+    toast(`${name} has been added to the game!`, {
       description: new Date().toLocaleTimeString("sv-SE"),
     });
   }
 
   async function handleRemovePlayer(formData: FormData) {
-    const playerId = parseInt(formData.get("playerId") as string);
+    const playerId = formData.get("playerId") as string;
     if (!playerId) return;
     const player = gamePlayers.find((player) => player.id === playerId);
     if (!player) return;
@@ -100,7 +112,7 @@ export default function GameDetails({ game, onGameRemoved }: GameDetailsProps) {
     await handleRemovePlayerFromGame(playerId, game.id);
     setGamePlayers(newPlayers);
     setScoredPlayers((players) => players.filter((p) => p.id !== playerId));
-    toast(`${player.name} har tagits bort från matchen!`, {
+    toast(`${player.name} has been removed from the game!`, {
       description: new Date().toLocaleTimeString("sv-SE"),
     });
   }
@@ -114,7 +126,7 @@ export default function GameDetails({ game, onGameRemoved }: GameDetailsProps) {
       };
     });
     await handleUpdateGameScores(scores, game.id);
-    toast("Utfallen har sparats!", {
+    toast("Scores have been saved!", {
       description: new Date().toLocaleTimeString("sv-SE"),
     });
   }
@@ -123,10 +135,21 @@ export default function GameDetails({ game, onGameRemoved }: GameDetailsProps) {
     await handleRemoveGame(game.id);
     onGameRemoved(game.id);
     setShowRemoveDialog(false);
-    toast("Matchen har tagits bort!", {
+    toast("Game has been removed!", {
       description: new Date().toLocaleTimeString("sv-SE"),
     });
   }
+
+  const handleUpdateSettings = async (data: {
+    seasonId?: string;
+    buyIn?: number;
+  }) => {
+    const updatedGame = await updateGameSettings(room.id, game.id, data);
+    // Update local state if needed
+    if (data.buyIn) {
+      setScoredPlayers(getPlayerScores(game.scores, gamePlayers));
+    }
+  };
 
   return (
     <>
@@ -135,16 +158,21 @@ export default function GameDetails({ game, onGameRemoved }: GameDetailsProps) {
         onClick={(e) => e.stopPropagation()}
         className="flex flex-col gap-4 lg:p-2"
       >
+        <GameSettings
+          game={game}
+          seasons={seasons}
+          onUpdate={handleUpdateSettings}
+        />
         <form
           action={handleAddPlayer}
           className="flex flex-col lg:flex-row gap-2"
         >
-          <AutoComplete players={nonAssignedPlayers} />
+          <AutoComplete players={nonAssignedPlayers} roomId={room.id} />
           <Button
             type="submit"
             className="flex items-center justify-center gap-1"
           >
-            Lägg till <Plus size={16} />
+            Add <Plus size={16} />
           </Button>
           <Seating players={gamePlayers} />
         </form>
@@ -161,12 +189,16 @@ export default function GameDetails({ game, onGameRemoved }: GameDetailsProps) {
                 variant="secondary"
                 size="sm"
               >
-                Spara <SaveIcon size={16} />
+                Save scores <SaveIcon size={16} />
               </Button>
               <div className="flex items-center">
                 <div className="flex gap-2 items-center">
-                  <Badge variant="destructive">Pengar in: {moneyIn} kr</Badge>
-                  <Badge variant="secondary">Pengar ut: {moneyOut} kr</Badge>
+                  <Badge variant="destructive">
+                    Money in: {moneyIn} {room.currency}
+                  </Badge>
+                  <Badge variant="secondary">
+                    Money out: {moneyOut} {room.currency}
+                  </Badge>
                 </div>
               </div>
             </div>
@@ -182,16 +214,15 @@ export default function GameDetails({ game, onGameRemoved }: GameDetailsProps) {
                     size="sm"
                     type="button"
                   >
-                    Ta bort match <X size={16} />
+                    Remove game <X size={16} />
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Ta bort match</DialogTitle>
+                    <DialogTitle>Remove game</DialogTitle>
                     <DialogDescription>
-                      Är du säker på att du vill ta bort matchen från{" "}
-                      {game.date.toLocaleDateString()}? Detta går inte att
-                      ångra.
+                      Are you sure you want to remove the game from{" "}
+                      {game.date.toLocaleDateString()}? This cannot be undone.
                     </DialogDescription>
                   </DialogHeader>
                   <DialogFooter>
@@ -199,16 +230,17 @@ export default function GameDetails({ game, onGameRemoved }: GameDetailsProps) {
                       variant="ghost"
                       onClick={() => setShowRemoveDialog(false)}
                     >
-                      Avbryt
+                      Cancel
                     </Button>
                     <Button variant="destructive" onClick={handleGameRemove}>
-                      Ta bort
+                      Remove
                     </Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
-              <Badge className="ms-auto" variant="default">
-                Snittstack: {Math.floor(moneyIn / (gamePlayers.length || 0))} kr
+              <Badge className="ms-auto rounded-lg font-bold" variant="default">
+                Average stack: {Math.floor(moneyIn / (gamePlayers.length || 0))}{" "}
+                {room.currency}
               </Badge>
             </div>
           </form>
