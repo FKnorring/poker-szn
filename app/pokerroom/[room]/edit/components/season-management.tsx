@@ -89,7 +89,7 @@ export default function SeasonManagement({
   };
 
   return (
-    <div className="border rounded-lg p-4 space-y-4">
+    <div className="border rounded-lg p-4 space-y-4 mb-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">Seasons</h2>
         {!isAddingNewSeason && (
