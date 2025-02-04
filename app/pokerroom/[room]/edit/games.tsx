@@ -128,7 +128,7 @@ export default function Games({
               </Tooltip>
             </TooltipProvider>
             <DatePicker
-              className="max-w-[150px]"
+              className="max-w-[150px] ml-auto"
               value={selectedDate}
               onChange={setSelectedDate}
             />
