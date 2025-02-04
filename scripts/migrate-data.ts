@@ -74,6 +74,10 @@ async function createSeasons(roomId: string) {
 
 async function migrateData() {
   try {
+    const scores = await readCsvFile<OldScore>(
+      path.join(process.cwd(), "data", "scores.csv")
+    );
+    /*
     const roomId = "cm6pm9ngx0005kt08yym2gsgw"; // Replace with your actual room ID
 
     // Create seasons
@@ -88,9 +92,7 @@ async function migrateData() {
     const players = await readCsvFile<OldPlayer>(
       path.join(process.cwd(), "data", "players.csv")
     );
-    const scores = await readCsvFile<OldScore>(
-      path.join(process.cwd(), "data", "scores.csv")
-    );
+    
 
     for (const player of players) {
       await prisma.player.upsert({
@@ -144,6 +146,20 @@ async function migrateData() {
           playerId: score["Player ID"],
           buyins: Number(score.Buyins),
           stack: Number(score.Stack),
+        },
+      });
+    }
+      */
+
+    for (const score of scores) {
+      await prisma.game.update({
+        where: { id: score["Game ID"] },
+        data: {
+          players: {
+            connect: {
+              id: score["Player ID"],
+            },
+          },
         },
       });
     }
