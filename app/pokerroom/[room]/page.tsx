@@ -6,9 +6,9 @@ import RoomCharts from "@/components/room-charts";
 export default async function RoomPage({
   params,
 }: {
-  params: { room: string };
+  params: Promise<{ room: string }>;
 }) {
-  const roomId = params.room;
+  const { room: roomId } = await params;
   const roomData = await getRoomData(roomId);
 
   if (!roomData) {
