@@ -14,11 +14,12 @@ const updateSeasonSchema = z.object({
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { seasonId: string } }
+  { params }: { params: Promise<{ seasonId: string }> }
 ) {
   try {
     const { getUser } = getKindeServerSession();
     const user = await getUser();
+    const { seasonId } = await params;
 
     if (!user?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -36,7 +37,7 @@ export async function PATCH(
 
     // Get the season and check permissions
     const season = await prisma.season.findUnique({
-      where: { id: params.seasonId },
+      where: { id: seasonId },
       include: { room: { include: { managers: true } } },
     });
 
@@ -54,7 +55,7 @@ export async function PATCH(
     }
 
     const updatedSeason = await prisma.season.update({
-      where: { id: params.seasonId },
+      where: { id: seasonId },
       data: {
         name: validatedData.data.name,
         startDate: validatedData.data.startDate,
