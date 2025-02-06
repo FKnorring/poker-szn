@@ -11,12 +11,12 @@ const updateRoomSchema = z.object({
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { room: string } }
+  { params }: { params: Promise<{ room: string }> }
 ) {
   try {
     const { getUser } = getKindeServerSession();
     const user = await getUser();
-
+    const { room: roomId } = await params;
     if (!user?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
@@ -33,7 +33,7 @@ export async function PATCH(
 
     // Get the room and check permissions
     const room = await prisma.pokerRoom.findUnique({
-      where: { id: params.room },
+      where: { id: roomId },
       include: { managers: true },
     });
 
@@ -51,7 +51,7 @@ export async function PATCH(
     }
 
     const updatedRoom = await prisma.pokerRoom.update({
-      where: { id: params.room },
+      where: { id: roomId },
       data: {
         name: validatedData.data.name,
         currency: validatedData.data.currency,

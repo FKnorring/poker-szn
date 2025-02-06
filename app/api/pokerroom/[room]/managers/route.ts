@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 
 export async function GET(
   request: Request,
-  { params }: { params: { room: string } }
+  { params }: { params: Promise<{ room: string }> }
 ) {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
@@ -13,8 +13,10 @@ export async function GET(
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
+  const { room: roomId } = await params;
+
   const room = await prisma.pokerRoom.findUnique({
-    where: { id: params.room },
+    where: { id: roomId },
     include: {
       managers: {
         include: {
@@ -42,17 +44,18 @@ export async function GET(
 
 export async function POST(
   request: Request,
-  { params }: { params: { room: string } }
+  { params }: { params: Promise<{ room: string }> }
 ) {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
+  const { room: roomId } = await params;
 
   if (!user?.id) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
   const room = await prisma.pokerRoom.findUnique({
-    where: { id: params.room },
+    where: { id: roomId },
   });
 
   if (!room) {
