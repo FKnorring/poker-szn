@@ -1,8 +1,8 @@
 "use client";
 
-import { ExtendedGame } from "@/app/edit/games";
+import { ExtendedGame } from "@/app/pokerroom/[room]/edit/games";
 import { Player } from "@prisma/client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -137,6 +137,7 @@ export default function ChartHandler({
   const latestGame = games.sort(
     (a, b) => b.date.getTime() - a.date.getTime()
   )[0];
+  const [selectedGame, setSelectedGame] = useState(latestGame?.id.toString());
   const [showPlayers, setshowPlayers] = useState(
     new Set<string>(latestGame?.players.map(({ name }) => name))
   );
@@ -166,7 +167,8 @@ export default function ChartHandler({
     setshowPlayers(newSet);
   }
 
-  function handleSelectPlayersFromMatch(gameId: string) {
+  const handleSelectPlayersFromMatch = useCallback((gameId: string) => {
+    setSelectedGame(gameId);
     if (gameId === "all") {
       setshowPlayers(new Set(players.map(({ name }) => name)));
       return;
@@ -190,13 +192,19 @@ export default function ChartHandler({
       console.error("Game not found");
       return;
     }
-    console.log(game);
     const newSet = new Set<string>();
-    game.scores.forEach((score) => {
-      newSet.add(score.player.name);
+    game.players.forEach((player) => {
+      newSet.add(player.name);
     });
     setshowPlayers(newSet);
-  }
+  }, [games, players]);
+
+  useEffect(() => {
+    const latestGame = games.sort(
+      (a, b) => b.date.getTime() - a.date.getTime()
+    )[0];
+    handleSelectPlayersFromMatch(latestGame?.id.toString());
+  }, [games, handleSelectPlayersFromMatch]);
 
   const filteredPlayers = players.filter(({ name }) => showPlayers.has(name));
   const unfilteredPlayers = players.filter(
@@ -211,7 +219,7 @@ export default function ChartHandler({
         <GameSelect
           games={games}
           onValueChange={handleSelectPlayersFromMatch}
-          defaultValue={latestGame?.id.toString()}
+          value={selectedGame}
         />
         {/** @ts-ignore */}
         <ChartSelect onValueChange={setChart} defaultValue={chart} />

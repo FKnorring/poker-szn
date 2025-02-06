@@ -17,7 +17,7 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from "@/components/ui/chart";
-import { ExtendedGame } from "@/app/edit/games";
+import { ExtendedGame } from "@/app/pokerroom/[room]/edit/games";
 import { Player } from "@prisma/client";
 import { Payload } from "recharts/types/component/DefaultLegendContent";
 import { extractTotals, stringToColorHash } from "../chart-utils";
@@ -72,7 +72,7 @@ export default function TotalChart({
           layout="vertical"
           content={({ payload }) => {
             return (
-              <ul className="flex flex-col">
+              <ul key={(payload as unknown as { value: string }).value} className="flex flex-col">
                 {payload?.map((entry) => renderPlayer(entry))}
               </ul>
             );
