@@ -74,13 +74,18 @@ export async function getRoomData(roomId: string) {
   }, 0);
 
   const idToName: { [key: string]: string } = {};
+  let obfuscatedPlayers = players;
+  
   // If no password access, obfuscate player names
   if (!hasPasswordAccess) {
     players.forEach((player, index) => {
-      const name = player.name;
-      player.name = `Player ${index + 1}`;
-      idToName[player.id] = name;
+      idToName[player.id] = `Player ${index + 1}`;
     });
+    
+    obfuscatedPlayers = players.map((player, index) => ({
+      ...player,
+      name: idToName[player.id]
+    }));
   }
 
   return {
@@ -91,20 +96,20 @@ export async function getRoomData(roomId: string) {
       }
       return {
         ...game,
-        scores: game.scores.map((score, index) => ({
+        scores: game.scores.map(score => ({
           ...score,
           player: {
             ...score.player,
-            name: idToName[score.player.id] || `Player ${index + 1}`
+            name: idToName[score.player.id]
           }
         })),
-        players: game.players.map((player, index) => ({
+        players: game.players.map(player => ({
           ...player,
-          name: idToName[player.id] || `Player ${index + 1}`
+          name: idToName[player.id]
         }))
       }
     }), 
-    players, 
+    players: obfuscatedPlayers, 
     totalBuyin, 
     hasPasswordAccess
   };

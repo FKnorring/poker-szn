@@ -34,7 +34,7 @@ export default function RoomPasswordInput({ roomId }: RoomPasswordInputProps) {
       }
 
       // Refresh the page to show unobfuscated data
-      router.refresh();
+      router.push(`/pokerroom/${roomId}`);
     } catch (err) {
       setError('Incorrect password');
     } finally {
