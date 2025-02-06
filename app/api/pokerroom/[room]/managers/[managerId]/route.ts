@@ -4,8 +4,9 @@ import prisma from "@/lib/prisma";
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { room: string; managerId: string } }
+  { params }: { params: Promise<{ room: string; managerId: string }> }
 ) {
+  const { room: roomId, managerId } = await params;
   const { getUser } = getKindeServerSession();
   const user = await getUser();
 
@@ -14,7 +15,7 @@ export async function DELETE(
   }
 
   const room = await prisma.pokerRoom.findUnique({
-    where: { id: params.room },
+    where: { id: roomId },
   });
 
   if (!room) {
@@ -27,7 +28,7 @@ export async function DELETE(
   }
 
   const manager = await prisma.roomManager.findUnique({
-    where: { id: params.managerId },
+    where: { id: managerId },
   });
 
   if (!manager) {
@@ -40,7 +41,7 @@ export async function DELETE(
   }
 
   await prisma.roomManager.delete({
-    where: { id: params.managerId },
+    where: { id: managerId },
   });
 
   return new NextResponse(null, { status: 204 });
