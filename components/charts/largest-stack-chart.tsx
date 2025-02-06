@@ -10,7 +10,7 @@ import {
   ResponsiveContainer,
   Brush,
 } from "recharts";
-import { ExtendedGame } from "@/app/edit/games";
+import { ExtendedGame } from "@/app/pokerroom/[room]/edit/games";
 import { Player } from "@prisma/client";
 import { calculateMaxStack, stringToColorHash } from "../chart-utils";
 import {

@@ -12,7 +12,7 @@ import {
   Cell,
   ReferenceLine,
 } from "recharts";
-import { ExtendedGame } from "@/app/edit/games";
+import { ExtendedGame } from "@/app/pokerroom/[room]/edit/games";
 import { Player } from "@prisma/client";
 import { extractWinrate, stringToColorHash } from "../chart-utils";
 import {

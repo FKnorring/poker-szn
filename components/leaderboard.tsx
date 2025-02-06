@@ -1,6 +1,6 @@
 "use client";
 
-import { ExtendedGame } from "@/app/edit/games";
+import { ExtendedGame } from "@/app/pokerroom/[room]/edit/games";
 import { Player } from "@prisma/client";
 import { getTop12WithMoreThanKGames, getTopPlayers } from "./chart-utils";
 import { Separator } from "./ui/separator";
