@@ -10,7 +10,7 @@ const updateGameSchema = z.object({
 
 export async function PATCH(
   request: Request,
-  params: Promise<{ room: string; gameId: string }>
+  { params }: { params: Promise<{ room: string; gameId: string }> }
 ) {
   try {
     const { getUser } = getKindeServerSession();
