@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 
 interface EditableCellProps {
-  id: number;
+  id: string;
   type: "buyins" | "stack";
   amount: number;
 }
