@@ -8,6 +8,7 @@ import CreationManagement from "./creation-management";
 import GameList from "./game-list";
 import { Separator } from "@/components/ui/separator";
 import { PokerRoom, Season } from "@prisma/client";
+import PaymentReport from "./payment-report";
 
 interface GameManagementProps {
   games: ExtendedGame[];
@@ -85,12 +86,15 @@ export default function GameManagement({
 
   return (
     <div className="flex-1 flex flex-col gap-2">
-      <CreationManagement
-        selectedDate={selectedDate}
-        setSelectedDate={setSelectedDate}
-        onQuickAdd={handleQuickAddGame}
-        onAddGame={handleAddNewGame}
-      />
+      <div className="flex items-center justify-between">
+        <CreationManagement
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          onQuickAdd={handleQuickAddGame}
+          onAddGame={handleAddNewGame}
+        />
+        <PaymentReport games={games} room={room} />
+      </div>
       <Separator />
       <GameList
         games={games}

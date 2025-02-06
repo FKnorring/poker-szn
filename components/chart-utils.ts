@@ -1,4 +1,4 @@
-import { ExtendedGame } from "@/app/edit/games";
+import { ExtendedGame } from "@/app/pokerroom/[room]/edit/games";
 import { Player } from "@prisma/client";
 
 type PlayerNames = {
@@ -101,8 +101,8 @@ export function extractWinrate(games: ExtendedGame[], players: Player[]) {
   );
 
   games.forEach((game) => {
-    game.scores.forEach(({ player, stack, buyins }) => {
-      const playerName = playerNames[player.id];
+    game.scores.forEach(({ playerId, stack, buyins }) => {
+      const playerName = playerNames[playerId];
       // Increment total games played for this player
       totalGames[playerName] += 1;
       // Check if the player won (did not lose money)

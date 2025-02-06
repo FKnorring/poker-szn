@@ -54,14 +54,14 @@ export default function Games({
 }: GamesProps) {
   return (
     <EditGameProvider values={{ players, setPlayers: () => {} }}>
-      <div className="flex gap-8 w-full max-w-7xl mx-auto">
+      <div className="flex flex-col md:flex-row gap-8 w-full max-w-7xl mx-auto">
         <GameManagement
           games={games}
           room={room}
           seasonId={seasons[0].id}
           seasons={seasons}
         />
-        <div className="w-[300px] flex-shrink-0">
+        <div className="w-full md:w-[300px] flex-shrink-0">
           <RoomManagement room={room} onRoomUpdate={updateRoom} />
           <ManagerManagement
             roomId={roomId}
