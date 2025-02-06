@@ -23,7 +23,6 @@ export default async function RoomPage({
       <Header editLink={canEdit ? `/pokerroom/${room.id}/edit` : undefined} />
       <main className="container mx-auto px-4">
         <div className="space-y-8">
-         
           <RoomCharts
             room={room}
             totalBuyin={totalBuyin}

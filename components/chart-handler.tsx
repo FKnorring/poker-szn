@@ -39,18 +39,22 @@ function DrawPlayer({ name, onClick }: { name: string; onClick: () => void }) {
   const bgColor = stringToColorHash(name);
   const textColor = getContrastColor(bgColor); // 'black' or 'white'
 
+  const [givenName, ...familyNames] = name.split(" ");
+
+  const renderedName = givenName + " " + familyNames.map((name) => name[0]).join(".");
+
   return (
     <li onClick={onClick} role="button" className="ms-2">
-      <Badge variant="outline" style={{ backgroundColor: bgColor }}>
+      <Badge variant="outline" style={{ backgroundColor: bgColor }} className="max-w-[80px] w-full">
         <span
-          className={`text-xs font-bold hidden lg:block ${
+          className={`text-xs font-bold hidden lg:block truncate ${
             textColor === "white" ? "text-white" : "text-black"
           }`}
         >
-          {name}
+          {renderedName}
         </span>
         <span
-          className={`text-xs font-bold block lg:hidden ${
+          className={`text-xs font-bold block lg:hidden truncate ${
             textColor === "white" ? "text-white" : "text-black"
           }`}
         >
@@ -230,7 +234,7 @@ export default function ChartHandler({
           {slideshow ? <Pause /> : <Play />}
         </Button>
       </div>
-      <ul className="flex flex-wrap">
+      <ul className="flex flex-wrap my-2">
         {unfilteredPlayers.map(({ name }) => (
           <DrawPlayer
             key={name}

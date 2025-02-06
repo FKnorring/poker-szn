@@ -12,12 +12,12 @@ export default async function Home() {
   return (
     <>
       <Header />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 mt-16">
         <div className="max-w-2xl mx-auto space-y-8">
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-bold">Welcome to Poker SZN</h1>
             <p className="text-xl text-muted-foreground">
-              Track and analyze your poker games with friends
+              Track and analyze your home poker games with friends
             </p>
           </div>
 

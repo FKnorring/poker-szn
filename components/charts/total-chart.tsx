@@ -72,7 +72,7 @@ export default function TotalChart({
           layout="vertical"
           content={({ payload }) => {
             return (
-              <ul key={payload?.[0]?.value || "legend" + payload?.length} className="flex flex-col">
+              <ul key={payload?.[0]?.value || "legend" + payload?.length} className="flex flex-col gap-1">
                 {payload?.map((entry) => renderPlayer(entry))}
               </ul>
             );

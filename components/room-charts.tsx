@@ -34,8 +34,14 @@ export default function RoomCharts({
       : games.filter((game) => game.seasonId === selectedSeason)
     : games;
 
+  const filteredPlayers = players.filter(player => 
+    filteredGames.some(game => 
+      game.players.some(gamePlayer => gamePlayer.id === player.id)
+    )
+  );
+
   return (
-    <div className="space-y-8">
+    <div className="flex h-[calc(100vh-6rem)] flex-col space-y-8">
       <div className="flex items-center">
         <div className="mr-8">
           <h1 className="text-3xl font-bold">{room.name}</h1>
@@ -49,12 +55,18 @@ export default function RoomCharts({
           onSeasonChange={setSelectedSeason}
         />
       </div>
-      <ChartHandler
-        games={filteredGames}
-        players={players}
-        currency={currency}
-      />
-      <Leaderboard games={filteredGames} players={players} />
+      <div className="flex flex-col lg:flex-row gap-8 flex-1 min-h-0">
+        <div className="flex-1">
+          <ChartHandler
+            games={filteredGames}
+            players={filteredPlayers}
+            currency={currency}
+          />
+        </div>
+        <div className="w-full lg:w-80">
+          <Leaderboard games={filteredGames} players={players} />
+        </div>
+      </div>
     </div>
   );
 }
