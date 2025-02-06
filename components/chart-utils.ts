@@ -101,8 +101,8 @@ export function extractWinrate(games: ExtendedGame[], players: Player[]) {
   );
 
   games.forEach((game) => {
-    game.scores.forEach(({ playerId, stack, buyins }) => {
-      const playerName = playerNames[playerId];
+    game.scores.forEach(({ player, stack, buyins }) => {
+      const playerName = playerNames[player.id];
       // Increment total games played for this player
       totalGames[playerName] += 1;
       // Check if the player won (did not lose money)
@@ -210,8 +210,8 @@ export function getTop10PlayersByAttendance(
   }, {} as PlayerData);
 
   games.forEach((game) => {
-    game.scores.forEach(({ playerId }) => {
-      const playerName = playerNames[playerId];
+    game.scores.forEach(({ player }) => {
+      const playerName = playerNames[player.id];
       if (playerName) {
         attendance[playerName] += 1;
       }

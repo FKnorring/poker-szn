@@ -25,7 +25,9 @@ import {
 
 export type ExtendedGame = Game & {
   players: Player[];
-  scores: Score[];
+  scores: (Score & {
+    player: Player;
+  })[];
   season: Season;
 };
 
