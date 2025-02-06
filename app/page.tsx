@@ -76,12 +76,11 @@ export default async function Home() {
 
             </form>
             <p className="text-muted-foreground text-xs text-center">
-              Note: You can also use the room ID to view the room. <br />
               <Link
                 href="/pokerroom/cm6pm9ngx0005kt08yym2gsgw"
                 className="text-blue-500"
               >
-                Try <strong>poker-szn</strong> to explore
+                Try the room <strong>poker-szn</strong> to explore
               </Link>
             </p>
           </div>
