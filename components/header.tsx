@@ -34,22 +34,22 @@ export default async function Header({
             <Heart
               size={16}
               strokeWidth={3}
-              className="text-red-100 bg-red-800 p-[1px]"
+              className="text-red-100 bg-red-800 p-[3px]"
             />
             <Spade
               size={16}
               strokeWidth={3}
-              className="text-slate-100 bg-slate-800 p-[1px]"
+              className="text-slate-100 bg-slate-800 p-[3px]"
             />
             <Diamond
               size={16}
               strokeWidth={3}
-              className="text-blue-100 bg-blue-800 p-[1px]"
+              className="text-blue-100 bg-blue-800 p-[3px]"
             />
             <Club
               size={16}
               strokeWidth={3}
-              className="text-green-100 bg-green-800 p-[1px]"
+              className="text-green-100 bg-green-800 p-[3px]"
             />
           </div>
           <h1
