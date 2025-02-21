@@ -45,7 +45,8 @@ export default function CreationManagement({
                   </>
                 ) : (
                   <>
-                    Quick add game <Zap size={16} />
+                    Quick add <span className="hidden md:inline">game</span>{" "}
+                    <Zap size={16} />
                   </>
                 )}
               </Button>

@@ -39,7 +39,7 @@ export default function GameList({
           <CollapsibleTrigger
             role="button"
             onClick={() => onGameSelect(game.id)}
-            className="w-full flex gap-2 justify-between items-center"
+            className="w-full flex justify-between items-center"
           >
             <ListGame game={game} />
             {game.id === selectedGame ? <ChevronDown /> : <ChevronRight />}
