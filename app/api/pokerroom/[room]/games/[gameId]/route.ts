@@ -87,11 +87,12 @@ export async function PATCH(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { room: string; gameId: string } }
+  { params }: { params: Promise<{ room: string; gameId: string }> }
 ) {
   try {
     const { getUser } = getKindeServerSession();
     const user = await getUser();
+    const { room: roomId, gameId } = await params;
 
     if (!user?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -99,7 +100,7 @@ export async function DELETE(
 
     // Get the room and check permissions
     const room = await prisma.pokerRoom.findUnique({
-      where: { id: params.room },
+      where: { id: roomId },
       include: { managers: true },
     });
 
@@ -117,24 +118,24 @@ export async function DELETE(
     }
 
     const game = await prisma.game.findUnique({
-      where: { id: params.gameId },
+      where: { id: gameId },
     });
 
     if (!game) {
       return new NextResponse("Game not found", { status: 404 });
     }
 
-    if (game.roomId !== params.room) {
+    if (game.roomId !== roomId) {
       return new NextResponse("Game not found in this room", { status: 404 });
     }
 
     // Delete the game and all related records
     await prisma.$transaction([
       prisma.score.deleteMany({
-        where: { gameId: params.gameId },
+        where: { gameId: gameId },
       }),
       prisma.game.delete({
-        where: { id: params.gameId },
+        where: { id: gameId },
       }),
     ]);
 
