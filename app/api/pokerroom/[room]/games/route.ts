@@ -11,11 +11,13 @@ const createGameSchema = z.object({
 
 export async function POST(
   request: Request,
-  { params }: { params: { room: string } }
+  { params }: { params: Promise<{ room: string }> }
 ) {
   try {
     const { getUser } = getKindeServerSession();
     const user = await getUser();
+
+    const { room: roomId } = await params;
 
     if (!user?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -33,7 +35,7 @@ export async function POST(
 
     // Get the room and check permissions
     const room = await prisma.pokerRoom.findUnique({
-      where: { id: params.room },
+      where: { id: roomId },
       include: { managers: true },
     });
 
@@ -54,7 +56,7 @@ export async function POST(
     const game = await prisma.game.create({
       data: {
         date: validatedData.data.date,
-        roomId: params.room,
+        roomId,
         seasonId: validatedData.data.seasonId,
         buyIn: validatedData.data.buyIn ?? room.defaultBuyIn,
       },
