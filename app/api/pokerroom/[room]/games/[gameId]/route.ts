@@ -84,3 +84,66 @@ export async function PATCH(
     );
   }
 }
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { room: string; gameId: string } }
+) {
+  try {
+    const { getUser } = getKindeServerSession();
+    const user = await getUser();
+
+    if (!user?.id) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    // Get the room and check permissions
+    const room = await prisma.pokerRoom.findUnique({
+      where: { id: params.room },
+      include: { managers: true },
+    });
+
+    if (!room) {
+      return new NextResponse("Room not found", { status: 404 });
+    }
+
+    // Check if user is creator or manager
+    const isCreatorOrManager =
+      room.creatorId === user.id ||
+      room.managers.some((manager) => manager.userId === user.id);
+
+    if (!isCreatorOrManager) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    const game = await prisma.game.findUnique({
+      where: { id: params.gameId },
+    });
+
+    if (!game) {
+      return new NextResponse("Game not found", { status: 404 });
+    }
+
+    if (game.roomId !== params.room) {
+      return new NextResponse("Game not found in this room", { status: 404 });
+    }
+
+    // Delete the game and all related records
+    await prisma.$transaction([
+      prisma.score.deleteMany({
+        where: { gameId: params.gameId },
+      }),
+      prisma.game.delete({
+        where: { id: params.gameId },
+      }),
+    ]);
+
+    return new NextResponse(null, { status: 204 });
+  } catch (error) {
+    console.error("Error deleting game:", error);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}

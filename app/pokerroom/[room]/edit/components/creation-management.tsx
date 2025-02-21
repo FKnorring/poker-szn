@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/datepicker";
-import { Plus, Zap } from "lucide-react";
+import { Loader2, Plus, Zap } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -16,6 +16,7 @@ interface CreationManagementProps {
   setSelectedDate: (date: Date | undefined) => void;
   onQuickAdd: () => void;
   onAddGame: () => void;
+  isCreating: boolean;
 }
 
 export default function CreationManagement({
@@ -23,6 +24,7 @@ export default function CreationManagement({
   setSelectedDate,
   onQuickAdd,
   onAddGame,
+  isCreating,
 }: CreationManagementProps) {
   return (
     <div className="space-y-4">
@@ -34,8 +36,18 @@ export default function CreationManagement({
                 onClick={onQuickAdd}
                 variant="default"
                 className="flex items-center justify-center gap-1"
+                disabled={isCreating}
               >
-                Quick add game <Zap size={16} />
+                {isCreating ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Creating game...
+                  </>
+                ) : (
+                  <>
+                    Quick add game <Zap size={16} />
+                  </>
+                )}
               </Button>
             </TooltipTrigger>
             <TooltipContent>
@@ -47,14 +59,24 @@ export default function CreationManagement({
           className="max-w-[150px] ml-auto"
           value={selectedDate}
           onChange={setSelectedDate}
+          disabled={isCreating}
         />
         <Button
           onClick={onAddGame}
           variant="secondary"
           className="flex items-center justify-center gap-1"
-          disabled={!selectedDate}
+          disabled={!selectedDate || isCreating}
         >
-          Add game <Plus size={16} />
+          {isCreating ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Creating...
+            </>
+          ) : (
+            <>
+              Add game <Plus size={16} />
+            </>
+          )}
         </Button>
       </div>
     </div>

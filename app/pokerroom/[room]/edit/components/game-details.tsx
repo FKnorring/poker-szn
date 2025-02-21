@@ -7,12 +7,15 @@ import {
   handleAddNewPlayerToGame,
   handleUpdateGameScores,
   handleRemovePlayerFromGame,
-  handleRemoveGame,
+  removeGame,
+  addPlayerToGame,
+  removePlayerFromGame,
+  updateGameScores,
 } from "../api";
 import { ExtendedGame } from "../games";
 import AutoComplete from "./autocomplete";
 import { Button } from "@/components/ui/button";
-import { Plus, Save, SaveIcon, X } from "lucide-react";
+import { Plus, Save, SaveIcon, X, Loader2 } from "lucide-react";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { toast } from "sonner";
@@ -44,15 +47,23 @@ export default function GameDetails({
   seasons,
 }: GameDetailsProps) {
   const { players } = useEditGame();
+  console.log("players", players.length);
   const [gamePlayers, setGamePlayers] = useState(game.players);
   const [scoredPlayers, setScoredPlayers] = useState(
     getPlayerScores(game.scores, gamePlayers)
   );
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
+  const [loadingStates, setLoadingStates] = useState({
+    addPlayer: false,
+    removePlayer: "",
+    saveScores: false,
+  });
 
   const { moneyIn, moneyOut } = getGameMoney(scoredPlayers, game.buyIn);
 
   const nonAssignedPlayers = getNonAssignedPlayers(players, gamePlayers);
+
+  console.log("nonAssignedPlayers", nonAssignedPlayers.length);
 
   function handleUpdatePlayer(
     id: string,
@@ -108,13 +119,25 @@ export default function GameDetails({
     if (!playerId) return;
     const player = gamePlayers.find((player) => player.id === playerId);
     if (!player) return;
-    const newPlayers = gamePlayers.filter((player) => player.id !== playerId);
-    await handleRemovePlayerFromGame(playerId, game.id);
-    setGamePlayers(newPlayers);
-    setScoredPlayers((players) => players.filter((p) => p.id !== playerId));
-    toast(`${player.name} has been removed from the game!`, {
-      description: new Date().toLocaleTimeString("sv-SE"),
-    });
+
+    try {
+      setLoadingStates((prev) => ({ ...prev, removePlayer: playerId }));
+      await removePlayerFromGame(room.id, game.id, playerId);
+
+      const newPlayers = gamePlayers.filter((player) => player.id !== playerId);
+      setGamePlayers(newPlayers);
+      setScoredPlayers((players) => players.filter((p) => p.id !== playerId));
+
+      toast.success(`${player.name} has been removed from the game!`, {
+        description: new Date().toLocaleTimeString("sv-SE"),
+      });
+    } catch (error) {
+      toast.error(`Failed to remove ${player.name} from the game`, {
+        description: "Please try again",
+      });
+    } finally {
+      setLoadingStates((prev) => ({ ...prev, removePlayer: "" }));
+    }
   }
 
   async function handleUpdateScores() {
@@ -125,18 +148,27 @@ export default function GameDetails({
         stack: player.stack,
       };
     });
-    await handleUpdateGameScores(scores, game.id);
-    toast("Scores have been saved!", {
-      description: new Date().toLocaleTimeString("sv-SE"),
-    });
+    try {
+      setLoadingStates((prev) => ({ ...prev, saveScores: true }));
+      await updateGameScores(room.id, game.id, scores);
+      toast.success("Scores have been saved!", {
+        description: new Date().toLocaleTimeString("sv-SE"),
+      });
+    } catch (error) {
+      toast.error("Failed to save scores", {
+        description: "Please try again",
+      });
+    } finally {
+      setLoadingStates((prev) => ({ ...prev, saveScores: false }));
+    }
   }
 
   async function handleGameRemove() {
-    await handleRemoveGame(game.id);
+    await removeGame(room.id, game.id);
     onGameRemoved(game.id);
     setShowRemoveDialog(false);
-    toast("Game has been removed!", {
-      description: new Date().toLocaleTimeString("sv-SE"),
+    toast.success("Game has been removed!", {
+      description: new Date().toLocaleDateString("sv-SE"),
     });
   }
 
@@ -163,22 +195,52 @@ export default function GameDetails({
           seasons={seasons}
           onUpdate={handleUpdateSettings}
         />
-        <form
-          action={handleAddPlayer}
-          className="flex flex-col lg:flex-row gap-2"
-        >
-          <AutoComplete players={nonAssignedPlayers} roomId={room.id} />
-          <Button
-            type="submit"
-            className="flex items-center justify-center gap-1"
-          >
-            Add <Plus size={16} />
-          </Button>
+        <div className="flex flex-col lg:flex-row gap-2">
+          <AutoComplete
+            players={nonAssignedPlayers}
+            roomId={room.id}
+            isLoading={loadingStates.addPlayer}
+            onSelect={async (playerName) => {
+              if (!playerName) return;
+              const player = players.find((p) => p.name === playerName);
+              if (gamePlayers.some((p) => p.id === player?.id)) return;
+
+              try {
+                setLoadingStates((prev) => ({ ...prev, addPlayer: true }));
+                const { player: addedPlayer, game: updatedGame } =
+                  await addPlayerToGame(
+                    room.id,
+                    game.id,
+                    player ? { playerId: player.id } : { name: playerName }
+                  );
+
+                setGamePlayers((players) => [...players, addedPlayer]);
+                setScoredPlayers((players) => [
+                  ...players,
+                  { ...addedPlayer, buyins: 1, stack: 100 },
+                ]);
+
+                toast(`${playerName} has been added to the game!`, {
+                  description: new Date().toLocaleTimeString("sv-SE"),
+                });
+              } catch (error) {
+                toast.error(`Failed to add ${playerName} to the game`, {
+                  description: "Please try again",
+                });
+              } finally {
+                setLoadingStates((prev) => ({ ...prev, addPlayer: false }));
+              }
+            }}
+          />
           <Seating players={gamePlayers} />
-        </form>
+        </div>
 
         <TableProvider
-          values={{ players: scoredPlayers, updatePlayer: handleUpdatePlayer }}
+          values={{
+            players: scoredPlayers,
+            updatePlayer: handleUpdatePlayer,
+            loadingStates,
+          }}
         >
           <form className="flex flex-col gap-2" action={handleRemovePlayer}>
             <DataTable columns={columns} data={scoredPlayers} />
@@ -188,8 +250,18 @@ export default function GameDetails({
                 className="flex items-center gap-2"
                 variant="secondary"
                 size="sm"
+                disabled={loadingStates.saveScores}
               >
-                Save scores <SaveIcon size={16} />
+                {loadingStates.saveScores ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    Save scores <SaveIcon size={16} />
+                  </>
+                )}
               </Button>
               <div className="flex items-center">
                 <div className="flex gap-2 items-center">

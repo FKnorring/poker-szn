@@ -35,6 +35,9 @@ interface TableContextProps {
     buyins: number | undefined,
     stack: number | undefined
   ) => void;
+  loadingStates: {
+    removePlayer: string;
+  };
 }
 
 export const TableContext = createContext<TableContextProps>(
