@@ -13,7 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 
 interface EditableCellProps {
   id: string;
@@ -141,7 +141,9 @@ export const columns: ColumnDef<ExtendedPlayer>[] = [
       function DeleteButton() {
         const [open, setOpen] = useState(false);
         const buttonRef = useRef<HTMLButtonElement>(null);
-        const { id } = row.original;
+        const { id, name } = row.original;
+        const { loadingStates } = useTable();
+        const isLoading = loadingStates.removePlayer === id;
 
         function handleClose() {
           buttonRef.current?.click();
@@ -152,16 +154,20 @@ export const columns: ColumnDef<ExtendedPlayer>[] = [
           <>
             <button ref={buttonRef} style={{ display: "none" }} type="submit" />
             <Dialog open={open}>
-              <DialogTrigger onClick={() => setOpen(true)}>
-                <X size={16} />
+              <DialogTrigger onClick={() => setOpen(true)} disabled={isLoading}>
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <X size={16} />
+                )}
                 {open && <input type="hidden" name="playerId" value={id} />}
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Ta bort spelare</DialogTitle>
+                  <DialogTitle>Remove player</DialogTitle>
                   <DialogDescription>
-                    Är du säker på att du vill ta bort{" "}
-                    <strong>{row.original.name}</strong> från matchen?
+                    Are you sure you want to remove <strong>{name}</strong> from
+                    the game?
                   </DialogDescription>
                 </DialogHeader>
                 <div className="flex">
@@ -171,9 +177,18 @@ export const columns: ColumnDef<ExtendedPlayer>[] = [
                     variant="destructive"
                     type="submit"
                     size="sm"
+                    disabled={isLoading}
                   >
-                    Ta bort
-                    <X size={16} />
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Removing...
+                      </>
+                    ) : (
+                      <>
+                        Remove <X size={16} />
+                      </>
+                    )}
                   </Button>
                 </div>
               </DialogContent>

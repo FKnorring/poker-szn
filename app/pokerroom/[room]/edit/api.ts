@@ -1,24 +1,73 @@
 import {
-  addPlayerToGame,
-  addNewPlayerToGame,
+  addPlayerToGame as addPlayerToGameServer,
+  addNewPlayerToGame as addNewPlayerToGameServer,
   addGame,
   updateScores,
-  removePlayerFromGame,
-  removeGame,
+  removePlayerFromGame as removePlayerFromGameServer,
+  removeGame as removeGameServer,
 } from "@/app/utils";
 
-export async function handleAddPlayerToGame(playerId: string, gameId: string) {
-  return await addPlayerToGame(playerId, gameId);
+export async function addPlayerToGame(
+  roomId: string,
+  gameId: string,
+  data: { playerId?: string; name?: string }
+) {
+  const response = await fetch(
+    `/api/pokerroom/${roomId}/games/${gameId}/players`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to add player to game");
+  }
+
+  return response.json();
 }
 
+// @deprecated Use addPlayerToGame instead
+export async function handleAddPlayerToGame(playerId: string, gameId: string) {
+  return await addPlayerToGameServer(playerId, gameId);
+}
+
+// @deprecated Use addPlayerToGame instead
 export async function handleAddNewPlayerToGame(
   name: string,
   gameId: string,
   roomId: string
 ) {
-  return await addNewPlayerToGame(name, gameId, roomId);
+  return await addNewPlayerToGameServer(name, gameId, roomId);
 }
 
+export async function createGame(
+  roomId: string,
+  data: {
+    date: string;
+    seasonId: string;
+    buyIn?: number;
+  }
+) {
+  const response = await fetch(`/api/pokerroom/${roomId}/games`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create game");
+  }
+
+  return response.json();
+}
+
+// @deprecated Use createGame instead
 export async function handleAddGame(
   date: string,
   roomId: string,
@@ -33,6 +82,30 @@ type ScoreData = {
   stack: number;
 };
 
+export async function updateGameScores(
+  roomId: string,
+  gameId: string,
+  scores: { playerId: string; buyins: number; stack: number }[]
+) {
+  const response = await fetch(
+    `/api/pokerroom/${roomId}/games/${gameId}/scores`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ scores }),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to update game scores");
+  }
+
+  return response.json();
+}
+
+// @deprecated Use updateGameScores instead
 export async function handleUpdateGameScores(
   scores: ScoreData[],
   gameId: string
@@ -40,15 +113,46 @@ export async function handleUpdateGameScores(
   await updateScores(scores, gameId);
 }
 
+export async function removePlayerFromGame(
+  roomId: string,
+  gameId: string,
+  playerId: string
+) {
+  const response = await fetch(
+    `/api/pokerroom/${roomId}/games/${gameId}/players/${playerId}`,
+    {
+      method: "DELETE",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to remove player from game");
+  }
+
+  return response.json();
+}
+
+// @deprecated Use removePlayerFromGame instead
 export async function handleRemovePlayerFromGame(
   playerId: string,
   gameId: string
 ) {
-  return await removePlayerFromGame(playerId, gameId);
+  return await removePlayerFromGameServer(playerId, gameId);
 }
 
-export async function handleRemoveGame(id: string) {
-  return await removeGame(id);
+export async function removeGame(roomId: string, gameId: string) {
+  const response = await fetch(`/api/pokerroom/${roomId}/games/${gameId}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to remove game");
+  }
+}
+
+// @deprecated Use removeGame instead
+export async function handleRemoveGame(gameId: string) {
+  return await removeGameServer(gameId);
 }
 
 export async function updateSeasonName(
