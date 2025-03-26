@@ -9,10 +9,10 @@ export default async function RoomPage({
   searchParams
 }: {
   params: Promise<{ room: string }>;
-  searchParams: { password: string };
+  searchParams: Promise<{ password: string }>;
 }) {
   const { room: roomId } = await params;
-  const password = searchParams.password;
+  const { password } = await searchParams;
   const roomData = await getRoomData(roomId, password);
 
   if (!roomData) {
