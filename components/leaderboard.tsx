@@ -22,8 +22,8 @@ function shortenName(name: string) {
   // If name is longer than 20 characters, shorten the last names
   if (name.length > 20) {
     const lastNameInitials = lastNameParts
-      .map((part) => (part ? part.charAt(0) + "." : ""))
-      .join(" ");
+      .map((part) => (part ? part.charAt(0) : ""))
+      .join("");
     return [firstName, lastNameInitials].join(" ").trim();
   } else {
     // Return the full name as is
