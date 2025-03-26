@@ -1,13 +1,8 @@
 import { PrismaClient } from "@prisma/client";
-import { revalidatePath } from "next/cache";
 import { CURRENT } from "@/config/season";
 import prisma from "@/lib/prisma";
 
 const CURRENT_SEASON = CURRENT.id;
-
-export function revalidateAll() {
-  revalidatePath("/", "layout");
-}
 
 export function getPlayers(roomId: string, seasonId?: string) {
   return prisma.player.findMany({
@@ -92,7 +87,6 @@ export async function addPlayer(name: string, roomId: string) {
       },
     },
   });
-  revalidateAll();
   return res;
 }
 
@@ -112,8 +106,7 @@ export async function addGame(date: Date, seasonId: string, roomId: string) {
       },
     },
   });
-
-  revalidateAll();
+  
   return res;
 }
 
@@ -124,7 +117,6 @@ export async function addNewPlayerToGame(
 ) {
   const player = await addPlayer(name, roomId);
   const { game, score } = await addPlayerToGame(player.id, gameId);
-  revalidateAll();
   return { player, game, score };
 }
 
@@ -156,7 +148,6 @@ export async function addPlayerToGame(playerId: string, gameId: string) {
       },
     },
   });
-  revalidateAll();
   return { game, score };
 }
 
@@ -168,7 +159,6 @@ export async function removeGame(id: string) {
   const game = await prisma.game.delete({
     where: { id },
   });
-  revalidateAll();
   return { game, score };
 }
 
@@ -191,7 +181,6 @@ export async function removePlayerFromGame(playerId: string, gameId: string) {
       gameId,
     },
   });
-  revalidateAll();
   return { game, score };
 }
 
@@ -216,7 +205,6 @@ export async function updateScores(
     })
   );
   const res = await prisma.$transaction(transactions);
-  revalidateAll();
   return res;
 }
 
@@ -244,7 +232,6 @@ export async function updateScore({
       stack,
     },
   });
-  revalidateAll();
   return res;
 }
 
