@@ -12,7 +12,7 @@ export async function checkRoomPassword(roomId: string, password: string): Promi
   return password === room.password;
 }
 
-export async function getRoomData(roomId: string) {
+export async function getRoomData(roomId: string, password?: string) {
   const room = await prisma.pokerRoom.findUnique({
     where: {
       id: roomId,
@@ -32,10 +32,9 @@ export async function getRoomData(roomId: string) {
 
   // Check if room is password protected and user has access
   const { canEdit } = await canEditRoom(roomId);
-  const storedPassword = await getRoomPasswordCookie(roomId);
   const hasPasswordAccess = !room.password ||
     canEdit ||
-    (storedPassword === room.password);
+    (password === room.password);
 
   // Get all games for the latest season
   const games = await prisma.game.findMany({
@@ -73,44 +72,95 @@ export async function getRoomData(roomId: string) {
     );
   }, 0);
 
-  const idToName: { [key: string]: string } = {};
+  const nameToObfuscated: { [key: string]: string } = {};
   let obfuscatedPlayers = players;
   
-  // If no password access, obfuscate player names
-  if (!hasPasswordAccess) {
-    players.forEach((player, index) => {
-      idToName[player.id] = `Player ${index + 1}`;
-    });
-    
-    obfuscatedPlayers = players.map((player, index) => ({
-      ...player,
-      name: idToName[player.id]
-    }));
+  // Simple but deterministic hash function for strings
+  function hashString(str: string): number {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return Math.abs(hash);
   }
 
+  // Seeded random number generator
+  function seededRandom(seed: number): number {
+    const x = Math.sin(seed++) * 10000;
+    return x - Math.floor(x);
+  }
+
+  // Fun poker-related terms for obfuscation
+  const firstTerms = [
+    "Lucky", "Wild", "Royal", "River", "Pocket", 
+    "Diamond", "Heart", "Spade", "Club", "Ace",
+    "King", "Queen", "Jack", "Joker", "Flush",
+    "Straight", "Full", "High", "Big", "Small",
+    "Quick", "Sharp", "Smooth", "Silent", "Bold"
+  ];
+  
+  const secondTerms = [
+    "Dealer", "Shark", "Bluffer", "Runner", "Roller",
+    "Stack", "Chips", "Cards", "House", "Pot",
+    "Draw", "Fold", "Call", "Raise", "Check",
+    "Ante", "River", "Flop", "Turn", "Split",
+    "Gambit", "Play", "Hand", "Bet", "Action"
+  ];
+
+  // If no password access, obfuscate player names
+  if (!hasPasswordAccess) {
+    // Create consistent mapping first
+    players.forEach((player) => {
+      const hash = hashString(player.name);
+      const rand1 = seededRandom(hash);
+      const rand2 = seededRandom(hash + 1);
+      
+      const firstIndex = Math.floor(rand1 * firstTerms.length);
+      const secondIndex = Math.floor(rand2 * secondTerms.length);
+      
+      nameToObfuscated[player.name] = `${firstTerms[firstIndex]} ${secondTerms[secondIndex]}`;
+    });
+    
+    // Apply mapping to main players list
+    obfuscatedPlayers = players.map(player => ({
+      ...player,
+      name: nameToObfuscated[player.name]
+    }));
+
+    // Apply mapping to games data consistently
+    const obfuscatedGames = games.map(game => ({
+      ...game,
+      scores: game.scores.map(score => ({
+        ...score,
+        player: {
+          ...score.player,
+          name: nameToObfuscated[score.player.name]
+        }
+      })),
+      players: game.players.map(player => ({
+        ...player,
+        name: nameToObfuscated[player.name]
+      }))
+    }));
+
+    // Return obfuscated data
+    return {
+      room,
+      games: obfuscatedGames,
+      players: obfuscatedPlayers,
+      totalBuyin,
+      hasPasswordAccess
+    };
+  }
+
+  // Return non-obfuscated data
   return {
-    room, 
-    games: games.map(game => {
-      if (hasPasswordAccess) {
-        return game;
-      }
-      return {
-        ...game,
-        scores: game.scores.map(score => ({
-          ...score,
-          player: {
-            ...score.player,
-            name: idToName[score.player.id]
-          }
-        })),
-        players: game.players.map(player => ({
-          ...player,
-          name: idToName[player.id]
-        }))
-      }
-    }), 
-    players: obfuscatedPlayers, 
-    totalBuyin, 
+    room,
+    games,
+    players,
+    totalBuyin,
     hasPasswordAccess
   };
 }

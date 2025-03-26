@@ -6,11 +6,14 @@ import RoomPasswordInput from "@/components/room-password-input";
 
 export default async function RoomPage({
   params,
+  searchParams
 }: {
   params: Promise<{ room: string }>;
+  searchParams: { password: string };
 }) {
   const { room: roomId } = await params;
-  const roomData = await getRoomData(roomId);
+  const password = searchParams.password;
+  const roomData = await getRoomData(roomId, password);
 
   if (!roomData) {
     notFound();
@@ -18,8 +21,6 @@ export default async function RoomPage({
 
   const canEdit = await canEditRoom(roomId);
   const { room, games, players, totalBuyin, hasPasswordAccess } = roomData;
-
-  console.log(games[0]);
 
   return (
     <>

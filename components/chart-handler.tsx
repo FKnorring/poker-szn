@@ -248,6 +248,7 @@ export default function ChartHandler({
         players: filteredPlayers,
         renderPlayer: (entry) => (
           <DrawPlayer
+            key={entry.value}
             name={entry.value}
             onClick={() => filterPlayer(entry.value)}
           />
