@@ -82,14 +82,14 @@ export default function AutoComplete({
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[300px] p-0">
+      <PopoverContent align="start"  className="w-[300px] p-0">
         <Command>
           <CommandInput
             placeholder="Search players..."
             value={inputValue}
             onValueChange={setInputValue}
           />
-          <CommandList>
+          <CommandList className="max-h-[150px] sm:max-h-[300px]">
             <CommandEmpty>
               {inputValue && (
                 <Button
@@ -98,7 +98,7 @@ export default function AutoComplete({
                   className="flex items-center justify-center w-full gap-2 p-2"
                   disabled={isLoading}
                 >
-                  Add new player <Plus className="w-4 h-4" />
+                  Add new player <Plus className="size-4" />
                 </Button>
               )}
             </CommandEmpty>

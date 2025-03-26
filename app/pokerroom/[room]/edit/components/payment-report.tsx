@@ -88,39 +88,39 @@ export default function PaymentReport({ games, room }: PaymentReportProps) {
         </TooltipContent>
       </Tooltip>
       </TooltipProvider>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-w-4xl p-4 sm:p-6 overflow-y-auto max-h-[90dvh]">
         <DialogHeader className="flex flex-row items-center justify-between">
           <DialogTitle>Payment Report</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <DateRangePicker date={date} onDateChange={setDate} />
-            <div className="text-sm text-muted-foreground">
+            <div className="text-xs sm:text-sm text-muted-foreground">
               {filteredGames.length} games selected
             </div>
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-2 sm:gap-4">
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">
+              <CardHeader className="p-3 sm:p-6 pb-2">
+                <CardTitle className="text-xs sm:text-base font-medium">
                   Total Payments
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
+              <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
+                <div className="text-xl sm:text-2xl font-bold">
                   {formatCurrency(totalPositiveBalance, room.currency)}
                 </div>
               </CardContent>
             </Card>
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">
+              <CardHeader className="p-3 sm:p-6 pb-2">
+                <CardTitle className="text-xs sm:text-base font-medium">
                   Players Involved
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
+              <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
+                <div className="text-xl sm:text-2xl font-bold">
                   {playerPayments.length}
                 </div>
               </CardContent>
@@ -130,24 +130,24 @@ export default function PaymentReport({ games, room }: PaymentReportProps) {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Player</TableHead>
-                  <TableHead className="text-right">Total Buy-in</TableHead>
-                  <TableHead className="text-right">Total Stack</TableHead>
-                  <TableHead className="text-right">Balance</TableHead>
+                  <TableHead className="text-xs sm:text-sm">Player</TableHead>
+                  <TableHead className="text-right text-xs sm:text-sm">Total Buy-in</TableHead>
+                  <TableHead className="text-right text-xs sm:text-sm">Total Stack</TableHead>
+                  <TableHead className="text-right text-xs sm:text-sm">Balance</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {sortedPayments.map((payment) => (
                   <TableRow key={payment.name}>
-                    <TableCell>{payment.name}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-xs sm:text-sm max-w-[10ch] sm:max-w-none truncate">{payment.name}</TableCell>
+                    <TableCell className="text-right text-xs sm:text-sm">
                       {formatCurrency(payment.totalBuyins * room.defaultBuyIn, room.currency)}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right text-xs sm:text-sm">
                       {formatCurrency(payment.totalStack, room.currency )}
                     </TableCell>
                     <TableCell
-                      className={`text-right font-bold ${
+                      className={`text-right font-bold text-xs sm:text-sm ${
                         payment.balance > 0
                           ? "text-green-600"
                           : payment.balance < 0

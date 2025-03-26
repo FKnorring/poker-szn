@@ -51,7 +51,7 @@ export default async function PokerRooms() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-bold">Your Poker Rooms</h1>
+            <h1 className="sm:text-3xl font-bold">Your Poker Rooms</h1>
             <Link href="/pokerrooms/create">
               <Button>Create New Room</Button>
             </Link>
