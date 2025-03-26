@@ -76,7 +76,7 @@ export default function Leaderboard({ games, players }: LeaderboardProps) {
                       : ""
                   }`}
                 >
-                  <span className="flex-grow">
+                  <span className="grow">
                     {i + 1}. {shortenName(name as string)}{" "}
                     {games && `(${games})`}
                   </span>

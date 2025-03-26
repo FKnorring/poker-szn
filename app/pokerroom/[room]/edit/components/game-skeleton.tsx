@@ -5,7 +5,7 @@ import { Skeleton } from "@/app/components/ui/skeleton";
 
 export default function GameSkeleton() {
   return (
-    <div className="border py-5 px-6 rounded-md flex flex-col shadow-sm space-y-4 animate-pulse">
+    <div className="border py-5 px-6 rounded-md flex flex-col shadow-xs space-y-4 animate-pulse">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Skeleton className="h-4 w-24" />
