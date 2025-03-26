@@ -9,7 +9,7 @@ export default function ListGame({ game }: { game: ExtendedGame }) {
   );
 
   return (
-    <div className="flex items-center flex-grow pe-2 gap-2">
+    <div className="flex items-center grow pe-2 gap-2">
       <h2>{game.date.toLocaleDateString("sv-SE")}</h2>
       <p className="ml-auto text-xs text-muted-foreground">
         {game.season.name}

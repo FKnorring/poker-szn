@@ -63,7 +63,7 @@ export default function Games({
           seasonId={seasons[0].id}
           seasons={seasons}
         />
-        <div className="w-full md:w-[300px] flex-shrink-0">
+        <div className="w-full md:w-[300px] shrink-0">
           <RoomManagement room={room} onRoomUpdate={updateRoom} />
           <ManagerManagement
             roomId={roomId}
